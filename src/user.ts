@@ -13,7 +13,7 @@ export type User = {
     legacyUserId?: string
     impersonatorUserId?: string
     metadata?: {[key: string]: any}
-    properties?: {[key: string]: any}
+    properties?: {[key: string]: unknown}
 }
 
 export type Org = {
@@ -48,7 +48,7 @@ export type UserMetadata = {
     legacyUserId?: string
     impersonatorUserId?: string
     metadata?: {[key: string]: any}
-    properties?: {[key: string]: any}
+    properties?: {[key: string]: unknown}
 }
 
 export class OrgMemberInfo {
