@@ -1,27 +1,32 @@
+export type {AccessToken, CreateAccessTokenRequest} from "./api/accessToken"
+export type {CreateMagicLinkRequest, MagicLink} from "./api/magicLink"
 export type {
-    TokenVerificationMetadata,
-    OrgQueryResponse,
     OrgQuery,
-    UsersQuery,
-    UsersInOrgQuery,
-    UsersPagedResponse,
-    CreateUserRequest,
-    UpdateUserMetadataRequest,
-    UpdateUserEmailRequest,
-    UpdateUserPasswordRequest,
-    CreateMagicLinkRequest,
-    MagicLink,
-    CreateAccessTokenRequest,
-    AccessToken,
-    MigrateUserFromExternalSourceRequest,
+    OrgQueryResponse,
     CreateOrgRequest,
     AddUserToOrgRequest,
     RemoveUserFromOrgRequest,
-    UpdateOrgRequest,
+    UpdateOrgRequest
+} from "./api/org"
+export type {TokenVerificationMetadata} from "./api/tokenVerificationMetadata"
+export type {
+    CreateUserRequest,
+    InviteUserToOrgRequest,
+    UpdateUserEmailRequest,
+    UpdateUserMetadataRequest,
+    UpdateUserPasswordRequest,
+    UsersInOrgQuery,
+    UsersPagedResponse,
+    UsersQuery,
+} from "./api/user"
+export type {
+    MigrateUserFromExternalSourceRequest,
+} from "./api/migrateUser"
+export type {
     ApiKeysQueryRequest,
     ApiKeysCreateRequest,
     ApiKeyUpdateRequest,
-} from "./api"
+} from "./api/endUserApiKeys"
 export {
     ApiKeyValidateException,
     ApiKeyDeleteException,
@@ -30,6 +35,7 @@ export {
     ApiKeyFetchException,
     AccessTokenCreationException,
     AddUserToOrgException,
+    BadRequestException,
     CreateOrgException,
     CreateUserException,
     ForbiddenException,
