@@ -20,6 +20,13 @@ export type Org = {
     orgId: string,
     name: string,
     maxUsers?: number,
+    isSamlConfigured: boolean,
+    metadata: {[key: string]: any},
+}
+
+export type CreatedOrg = {
+    orgId: string,
+    name: string,
 }
 
 export type UserMetadata = {
@@ -57,9 +64,9 @@ export class OrgMemberInfo {
     public readonly orgMetadata: {[key: string]: any}
     public readonly urlSafeOrgName: string
 
-    private readonly userAssignedRole: string
-    private readonly userInheritedRolesPlusCurrentRole: string[]
-    private readonly userPermissions: string[]
+    public readonly userAssignedRole: string
+    public readonly userInheritedRolesPlusCurrentRole: string[]
+    public readonly userPermissions: string[]
 
     constructor(orgId: string, orgName: string, orgMetadata: {[key: string]: any}, urlSafeOrgName: string, userAssignedRole: string, userInheritedRolesPlusCurrentRole: string[], userPermissions: string[]) {
         this.orgId = orgId
