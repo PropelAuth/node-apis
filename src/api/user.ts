@@ -32,6 +32,7 @@ export type UsersInOrgQuery = {
     pageSize?: number
     pageNumber?: number
     includeOrgs?: boolean
+    role?: string
 }
 
 // GET
@@ -116,6 +117,7 @@ export function fetchUsersInOrg(
         page_size: query.pageSize,
         page_number: query.pageNumber,
         include_orgs: query.includeOrgs,
+        role: query.role,
     }
     const queryString = formatQueryParameters(queryParams)
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/org/${query.orgId}?${queryString}`, "GET").then(
