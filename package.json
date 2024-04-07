@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/PropelAuth/node-apis"
   },
-  "version": "v2.1.5",
+  "version": "v2.1.6",
   "license": "MIT",
   "keywords": [
     "auth",
@@ -28,9 +28,18 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
+      "browser": "./dist/index.mjs",
+      "default": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ]
     }
   }
 }

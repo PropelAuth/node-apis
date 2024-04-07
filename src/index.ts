@@ -10,7 +10,7 @@ export type {
     UpdateOrgRequest
 } from "./api/org"
 export type {
-    TokenVerificationMetadata, 
+    TokenVerificationMetadata,
 } from "./api/tokenVerificationMetadata"
 export type {
     CreateUserRequest,
@@ -74,11 +74,15 @@ export type {
     ApiKeyResultPage,
     ApiKeyValidation,
     PersonalApiKeyValidation,
-    OrgApiKeyValidation
+    OrgApiKeyValidation,
+    InternalUser,
+    InternalOrgMemberInfo,
 } from "./user"
 export {
     UserClass,
     OrgMemberInfo,
+    toUser,
+    toOrgIdToOrgMemberInfo,
 } from "./user"
 export {
     getApis

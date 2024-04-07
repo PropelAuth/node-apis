@@ -2,15 +2,6 @@ import { validateApiKey } from "./api/endUserApiKeys"
 import { ApiKeyValidateException } from "./exceptions"
 import { OrgApiKeyValidation, PersonalApiKeyValidation } from "./user"
 
-export function validateAuthUrl(authUrl: string): URL {
-    try {
-        return new URL(authUrl)
-    } catch (e) {
-        console.error("Invalid authUrl", e)
-        throw new Error("Unable to initialize auth client")
-    }
-}
-
 export async function validatePersonalApiKey(
     authUrl: URL,
     integrationApiKey: string,
