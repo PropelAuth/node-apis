@@ -5,10 +5,13 @@ export type {
     OrgQueryResponse,
     CreateOrgRequest,
     AddUserToOrgRequest,
+    ChangeUserRoleInOrgRequest,
     RemoveUserFromOrgRequest,
     UpdateOrgRequest
 } from "./api/org"
-export type {TokenVerificationMetadata} from "./api/tokenVerificationMetadata"
+export type {
+    TokenVerificationMetadata, 
+} from "./api/tokenVerificationMetadata"
 export type {
     CreateUserRequest,
     InviteUserToOrgRequest,
@@ -18,6 +21,7 @@ export type {
     UsersInOrgQuery,
     UsersPagedResponse,
     UsersQuery,
+    UserSignupQueryParams,
 } from "./api/user"
 export type {
     MigrateUserFromExternalSourceRequest,
@@ -49,21 +53,32 @@ export {
     ChangeUserRoleInOrgException,
     RemoveUserFromOrgException,
     UpdateOrgException,
-    UpdateUserPasswordException
+    UpdateUserPasswordException,
 } from "./exceptions"
 export type {
+    SocialLoginProvider,
+    SamlLoginProvider,
+    LoginMethod,
+} from "./loginMethod"
+export type {
+    UserProperties,
     User,
     Org,
-    OrgIdToOrgMemberInfo,
-    OrgMemberInfo,
-    UserAndOrgMemberInfo,
+    CreatedOrg,
+    CreatedUser,
     UserMetadata,
-    PersonalApiKeyValidation,
+    UserAndOrgMemberInfo,
+    OrgIdToOrgMemberInfo,
     ApiKeyNew,
+    ApiKeyFull,
     ApiKeyResultPage,
     ApiKeyValidation,
-    ApiKeyFull,
+    PersonalApiKeyValidation,
     OrgApiKeyValidation
+} from "./user"
+export {
+    UserClass,
+    OrgMemberInfo,
 } from "./user"
 export {
     getApis

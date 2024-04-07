@@ -1,6 +1,6 @@
 import { MigrateUserException } from "../exceptions"
 import { httpRequest } from "../http"
-import { User } from "../user"
+import { CreatedUser } from "../user"
 import { parseSnakeCaseToCamelCase } from "../utils"
 
 const ENDPOINT_PATH = "/api/backend/v1/migrate_user"
@@ -27,7 +27,7 @@ export function migrateUserFromExternalSource(
     authUrl: URL,
     integrationApiKey: string,
     migrateUserFromExternalSourceRequest: MigrateUserFromExternalSourceRequest
-): Promise<User> {
+): Promise<CreatedUser> {
     const request = {
         email: migrateUserFromExternalSourceRequest.email,
         email_confirmed: migrateUserFromExternalSourceRequest.emailConfirmed,
@@ -44,7 +44,7 @@ export function migrateUserFromExternalSource(
         username: migrateUserFromExternalSourceRequest.username,
         properties: migrateUserFromExternalSourceRequest.properties,
     }
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}`, "POST", JSON.stringify(request)).then(
+    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")

@@ -19,8 +19,10 @@ export function fetchTokenVerificationMetadata(
 
     return httpRequest(authUrl, integrationApiKey, ENDPOINT_PATH, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
+            console.error("Your API key is incorrect")
             throw new Error("integrationApiKey is incorrect")
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            console.error(`Error fetching token verification metadata: ${httpResponse.statusCode}`)
             throw new Error("Unknown error when fetching token verification metadata")
         }
 

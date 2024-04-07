@@ -4,10 +4,10 @@ import {
     ApiKeyResultPage,
     ApiKeyValidation,
     CreatedOrg,
+    CreatedUser,
     Org,
     OrgApiKeyValidation,
     PersonalApiKeyValidation,
-    User,
     UserMetadata
 } from "./user"
 import {
@@ -24,6 +24,7 @@ import {
     fetchUserMetadataByQuery,
     fetchUserMetadataByUserIdWithIdCheck,
     fetchUsersByQuery,
+    fetchUserSignupQueryParams,
     fetchUsersInOrg,
     inviteUserToOrg,
     InviteUserToOrgRequest,
@@ -33,6 +34,7 @@ import {
     UpdateUserMetadataRequest,
     updateUserPassword,
     UpdateUserPasswordRequest,
+    UserSignupQueryParams,
     UsersInOrgQuery,
     UsersPagedResponse,
     UsersQuery
@@ -72,8 +74,13 @@ import {
     validateApiKey
 } from "./api/endUserApiKeys";
 import {validateOrgApiKey, validatePersonalApiKey} from "./validators";
+import { TokenVerificationMetadata, fetchTokenVerificationMetadata } from "./api/tokenVerificationMetadata";
 
 export function getApis(authUrl: URL, integrationApiKey: string) {
+    function fetchTokenVerificationMetadataWrapper(): Promise<TokenVerificationMetadata> {
+        return fetchTokenVerificationMetadata(authUrl, integrationApiKey)
+    }
+
     function fetchUserMetadataByUserId(userId: string, includeOrgs?: boolean): Promise<UserMetadata | null> {
         return fetchUserMetadataByUserIdWithIdCheck(authUrl, integrationApiKey, userId, includeOrgs)
     }
@@ -150,7 +157,11 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return fetchUsersInOrg(authUrl, integrationApiKey, usersInOrgQuery)
     }
 
-    function createUserWrapper(createUserRequest: CreateUserRequest): Promise<User> {
+    function fetchUserSignupQueryParamsWrapper(userId: string): Promise<UserSignupQueryParams | null> {
+        return fetchUserSignupQueryParams(authUrl, integrationApiKey, userId)
+    }
+
+    function createUserWrapper(createUserRequest: CreateUserRequest): Promise<CreatedUser> {
         return createUser(authUrl, integrationApiKey, createUserRequest)
     }
 
@@ -210,7 +221,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
 
     function migrateUserFromExternalSourceWrapper(
         migrateUserFromExternalSourceRequest: MigrateUserFromExternalSourceRequest
-    ): Promise<User> {
+    ): Promise<CreatedUser> {
         return migrateUserFromExternalSource(authUrl, integrationApiKey, migrateUserFromExternalSourceRequest)
     }
 
@@ -289,6 +300,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
 
     return {
         // fetching functions
+        fetchTokenVerificationMetadata: fetchTokenVerificationMetadataWrapper,
         fetchUserMetadataByUserId,
         fetchUserMetadataByEmail,
         fetchUserMetadataByUsername,
@@ -299,11 +311,14 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         fetchOrgByQuery: fetchOrgsByQueryWrapper,
         fetchUsersByQuery: fetchUsersByQueryWrapper,
         fetchUsersInOrg: fetchUsersInOrgWrapper,
+        fetchUserSignupQueryParams: fetchUserSignupQueryParamsWrapper,
+
         // user management functions
         createUser: createUserWrapper,
         updateUserMetadata: updateUserMetadataWrapper,
         updateUserEmail: updateUserEmailWrapper,
         updateUserPassword: updateUserPasswordWrapper,
+        clearUserPassword: clearUserPasswordWrapper,
         createMagicLink: createMagicLinkWrapper,
         createAccessToken: createAccessTokenWrapper,
         migrateUserFromExternalSource: migrateUserFromExternalSourceWrapper,
