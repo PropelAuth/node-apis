@@ -28,6 +28,8 @@ import {
     fetchUsersInOrg,
     inviteUserToOrg,
     InviteUserToOrgRequest,
+    inviteUserToOrgWithRoles,
+    InviteUserToOrgWithRolesRequest,
     updateUserEmail,
     UpdateUserEmailRequest,
     updateUserMetadata,
@@ -42,9 +44,13 @@ import {
 import {
     addUserToOrg,
     AddUserToOrgRequest,
+    addUserToOrgWithRoles,
+    AddUserToOrgWithRolesRequest,
     allowOrgToSetupSamlConnection,
     changeUserRoleInOrg,
     ChangeUserRoleInOrgRequest,
+    changeUserRolesInOrg,
+    ChangeUserRolesInOrgRequest,
     createOrg,
     CreateOrgRequest,
     deleteOrg,
@@ -233,8 +239,16 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return addUserToOrg(authUrl, integrationApiKey, addUserToOrgRequest)
     }
 
+    function addUserToOrgWithRolesWrapper(addUserToOrgWithRolesRequest: AddUserToOrgWithRolesRequest): Promise<boolean> {
+        return addUserToOrgWithRoles(authUrl, integrationApiKey, addUserToOrgWithRolesRequest)
+    }
+
     function changeUserRoleInOrgWrapper(changeUserRoleInOrgRequest: ChangeUserRoleInOrgRequest): Promise<boolean> {
         return changeUserRoleInOrg(authUrl, integrationApiKey, changeUserRoleInOrgRequest)
+    }
+
+    function changeUserRolesInOrgWrapper(changeUserRolesInOrgRequest: ChangeUserRolesInOrgRequest): Promise<boolean> {
+        return changeUserRolesInOrg(authUrl, integrationApiKey, changeUserRolesInOrgRequest)
     }
 
     function removeUserFromOrgWrapper(removeUserFromOrgRequest: RemoveUserFromOrgRequest): Promise<boolean> {
@@ -259,6 +273,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
 
     function inviteUserToOrgWrapper(inviteUserToOrgRequest: InviteUserToOrgRequest): Promise<boolean> {
         return inviteUserToOrg(authUrl, integrationApiKey, inviteUserToOrgRequest)
+    }
+
+    function inviteUserToOrgWithRolesWrapper(inviteUserToOrgWithRolesRequest: InviteUserToOrgWithRolesRequest): Promise<boolean> {
+        return inviteUserToOrgWithRoles(authUrl, integrationApiKey, inviteUserToOrgWithRolesRequest)
     }
 
     // end user api key wrappers
@@ -331,13 +349,16 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         // org management functions
         createOrg: createOrgWrapper,
         addUserToOrg: addUserToOrgWrapper,
+        addUserToOrgWithRoles: addUserToOrgWithRolesWrapper,
         changeUserRoleInOrg: changeUserRoleInOrgWrapper,
+        changeUserRolesInOrg: changeUserRolesInOrgWrapper,
         removeUserFromOrg: removeUserFromOrgWrapper,
         updateOrg: updateOrgWrapper,
         deleteOrg: deleteOrgWrapper,
         allowOrgToSetupSamlConnection: allowOrgToSetupSamlConnectionWrapper,
         disallowOrgToSetupSamlConnection: disallowOrgToSetupSamlConnectionWrapper,
         inviteUserToOrg: inviteUserToOrgWrapper,
+        inviteUserToOrgWithRoles: inviteUserToOrgWithRolesWrapper,
         // api keys functions
         fetchApiKey: fetchApiKeyWrapper,
         fetchCurrentApiKeys: fetchCurrentApiKeysWrapper,
