@@ -1,5 +1,5 @@
-export type {AccessToken, CreateAccessTokenRequest} from "./api/accessToken"
-export type {CreateMagicLinkRequest, MagicLink} from "./api/magicLink"
+export type { AccessToken, CreateAccessTokenRequest } from "./api/accessToken"
+export type { CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
 export type {
     OrgQuery,
     OrgQueryResponse,
@@ -7,11 +7,9 @@ export type {
     AddUserToOrgRequest,
     ChangeUserRoleInOrgRequest,
     RemoveUserFromOrgRequest,
-    UpdateOrgRequest
+    UpdateOrgRequest,
 } from "./api/org"
-export type {
-    TokenVerificationMetadata,
-} from "./api/tokenVerificationMetadata"
+export type { TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 export type {
     CreateUserRequest,
     InviteUserToOrgRequest,
@@ -23,14 +21,8 @@ export type {
     UsersQuery,
     UserSignupQueryParams,
 } from "./api/user"
-export type {
-    MigrateUserFromExternalSourceRequest,
-} from "./api/migrateUser"
-export type {
-    ApiKeysQueryRequest,
-    ApiKeysCreateRequest,
-    ApiKeyUpdateRequest,
-} from "./api/endUserApiKeys"
+export type { MigrateUserFromExternalSourceRequest } from "./api/migrateUser"
+export type { ApiKeysQueryRequest, ApiKeysCreateRequest, ApiKeyUpdateRequest } from "./api/endUserApiKeys"
 export {
     ApiKeyValidateException,
     ApiKeyDeleteException,
@@ -55,15 +47,12 @@ export {
     UpdateOrgException,
     UpdateUserPasswordException,
 } from "./exceptions"
-export type {
-    SocialLoginProvider,
-    SamlLoginProvider,
-    LoginMethod,
-} from "./loginMethod"
+export type { SocialLoginProvider, SamlLoginProvider, LoginMethod } from "./loginMethod"
 export type {
     UserProperties,
     User,
     Org,
+    Organization,
     CreatedOrg,
     CreatedUser,
     UserMetadata,
@@ -78,12 +67,5 @@ export type {
     InternalUser,
     InternalOrgMemberInfo,
 } from "./user"
-export {
-    UserClass,
-    OrgMemberInfo,
-    toUser,
-    toOrgIdToOrgMemberInfo,
-} from "./user"
-export {
-    getApis
-} from "./api"
+export { UserClass, OrgMemberInfo, toUser, toOrgIdToOrgMemberInfo } from "./user"
+export { getApis } from "./api"
