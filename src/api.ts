@@ -7,8 +7,9 @@ import {
     CreatedUser,
     Org,
     OrgApiKeyValidation,
+    Organization,
     PersonalApiKeyValidation,
-    UserMetadata
+    UserMetadata,
 } from "./user"
 import {
     clearUserPassword,
@@ -37,8 +38,8 @@ import {
     UserSignupQueryParams,
     UsersInOrgQuery,
     UsersPagedResponse,
-    UsersQuery
-} from "./api/user";
+    UsersQuery,
+} from "./api/user"
 import {
     addUserToOrg,
     AddUserToOrgRequest,
@@ -56,11 +57,11 @@ import {
     removeUserFromOrg,
     RemoveUserFromOrgRequest,
     updateOrg,
-    UpdateOrgRequest
-} from "./api/org";
-import {createMagicLink, CreateMagicLinkRequest, MagicLink} from "./api/magicLink";
-import {AccessToken, createAccessToken, CreateAccessTokenRequest} from "./api/accessToken";
-import {migrateUserFromExternalSource, MigrateUserFromExternalSourceRequest} from "./api/migrateUser";
+    UpdateOrgRequest,
+} from "./api/org"
+import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
+import { AccessToken, createAccessToken, CreateAccessTokenRequest } from "./api/accessToken"
+import { migrateUserFromExternalSource, MigrateUserFromExternalSourceRequest } from "./api/migrateUser"
 import {
     ApiKeysCreateRequest,
     ApiKeysQueryRequest,
@@ -71,10 +72,10 @@ import {
     fetchArchivedApiKeys,
     fetchCurrentApiKeys,
     updateApiKey,
-    validateApiKey
-} from "./api/endUserApiKeys";
-import {validateOrgApiKey, validatePersonalApiKey} from "./validators";
-import { TokenVerificationMetadata, fetchTokenVerificationMetadata } from "./api/tokenVerificationMetadata";
+    validateApiKey,
+} from "./api/endUserApiKeys"
+import { validateOrgApiKey, validatePersonalApiKey } from "./validators"
+import { TokenVerificationMetadata, fetchTokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 
 export function getApis(authUrl: URL, integrationApiKey: string) {
     function fetchTokenVerificationMetadataWrapper(): Promise<TokenVerificationMetadata> {
@@ -141,7 +142,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         )
     }
 
-    function fetchOrgWrapper(orgId: string): Promise<Org | null> {
+    function fetchOrgWrapper(orgId: string): Promise<Organization | null> {
         return fetchOrg(authUrl, integrationApiKey, orgId)
     }
 
