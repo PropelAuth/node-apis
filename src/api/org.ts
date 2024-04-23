@@ -164,7 +164,7 @@ export function addUserToOrg(
         user_id: addUserToOrgRequest.userId,
         org_id: addUserToOrgRequest.orgId,
         role: addUserToOrgRequest.role,
-        additional_roles: addUserToOrgRequest.additionalRoles,
+        additional_roles: addUserToOrgRequest.additionalRoles ?? [],
     }
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/add_user`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
@@ -199,7 +199,7 @@ export function changeUserRoleInOrg(
         user_id: changeUserRoleInOrgRequest.userId,
         org_id: changeUserRoleInOrgRequest.orgId,
         role: changeUserRoleInOrgRequest.role,
-        additional_roles: changeUserRoleInOrgRequest.additionalRoles,
+        additional_roles: changeUserRoleInOrgRequest.additionalRoles ?? [],
     }
     return httpRequest(
         authUrl,
