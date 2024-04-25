@@ -50,6 +50,7 @@ import {
     CreateOrgRequest,
     deleteOrg,
     disallowOrgToSetupSamlConnection,
+    fetchCustomRoleMappings,
     fetchOrg,
     fetchOrgByQuery,
     OrgQuery,
@@ -76,6 +77,7 @@ import {
 } from "./api/endUserApiKeys"
 import { validateOrgApiKey, validatePersonalApiKey } from "./validators"
 import { TokenVerificationMetadata, fetchTokenVerificationMetadata } from "./api/tokenVerificationMetadata"
+import { CustomRoleMappings } from "./customRoleMappings"
 
 export function getApis(authUrl: URL, integrationApiKey: string) {
     function fetchTokenVerificationMetadataWrapper(): Promise<TokenVerificationMetadata> {
@@ -148,6 +150,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
 
     function fetchOrgsByQueryWrapper(orgQuery: OrgQuery): Promise<OrgQueryResponse> {
         return fetchOrgByQuery(authUrl, integrationApiKey, orgQuery)
+    }
+
+    function fetchCustomRoleMappingsWrapper(): Promise<CustomRoleMappings> {
+        return fetchCustomRoleMappings(authUrl, integrationApiKey)
     }
 
     function fetchUsersByQueryWrapper(usersQuery: UsersQuery): Promise<UsersPagedResponse> {
@@ -310,6 +316,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         fetchBatchUserMetadataByUsernames,
         fetchOrg: fetchOrgWrapper,
         fetchOrgByQuery: fetchOrgsByQueryWrapper,
+        fetchCustomRoleMappings: fetchCustomRoleMappingsWrapper,
         fetchUsersByQuery: fetchUsersByQueryWrapper,
         fetchUsersInOrg: fetchUsersInOrgWrapper,
         fetchUserSignupQueryParams: fetchUserSignupQueryParamsWrapper,

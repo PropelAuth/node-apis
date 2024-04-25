@@ -1,3 +1,4 @@
+import { CustomRoleMappings } from "../customRoleMappings"
 import {
     AddUserToOrgException,
     ChangeUserRoleInOrgException,
@@ -28,6 +29,22 @@ export function fetchOrg(authUrl: URL, integrationApiKey: string, orgId: string)
             )
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
             throw new Error("Unknown error when fetching org")
+        }
+
+        return parseSnakeCaseToCamelCase(httpResponse.response)
+    })
+}
+
+export function fetchCustomRoleMappings(authUrl: URL, integrationApiKey: string): Promise<CustomRoleMappings> {
+    return httpRequest(authUrl, integrationApiKey, "/api/backend/v1/custom_role_mappings", "GET").then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 426) {
+            throw new Error(
+                "Cannot use organizations unless B2B support is enabled. Enable it in your PropelAuth dashboard."
+            )
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when fetching custom role mappings")
         }
 
         return parseSnakeCaseToCamelCase(httpResponse.response)
@@ -315,6 +332,7 @@ export type UpdateOrgRequest = {
     canJoinOnEmailDomainMatch?: boolean // In the backend, this is the `domain_autojoin` argument.
     membersMustHaveEmailDomainMatch?: boolean // In the backend, this is the `domain_restrict` argument.
     domain?: string
+    customRoleMappingId?: string
     // TODO: Add `require_2fa_by` optional argument.
 }
 
@@ -335,6 +353,7 @@ export function updateOrg(
         autojoin_by_domain: updateOrgRequest.canJoinOnEmailDomainMatch,
         restrict_to_domain: updateOrgRequest.membersMustHaveEmailDomainMatch,
         domain: updateOrgRequest.domain,
+        custom_role_mapping_id: updateOrgRequest.customRoleMappingId,
     }
     return httpRequest(
         authUrl,
