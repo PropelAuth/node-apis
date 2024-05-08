@@ -78,6 +78,8 @@ export function fetchOrgByQuery(authUrl: URL, integrationApiKey: string, query: 
                     this.name = value
                 } else if (key === "max_users") {
                     this.maxUsers = value
+                } else if (key === "legacy_org_id") {
+                    this.legacyOrgId = value
                 } else if (key === "total_orgs") {
                     this.totalOrgs = value
                 } else if (key === "current_page") {
@@ -100,6 +102,7 @@ export type CreateOrgRequest = {
     enableAutoJoiningByDomain?: boolean
     membersMustHaveMatchingDomain?: boolean
     maxUsers?: number
+    legacyOrgId?: string
 }
 
 type CreateOrgApiRequest = {
@@ -108,6 +111,7 @@ type CreateOrgApiRequest = {
     enable_auto_joining_by_domain?: boolean
     members_must_have_matching_domain?: boolean
     max_users?: number
+    legacy_org_id?: string
 }
 
 export function createOrg(
@@ -121,6 +125,7 @@ export function createOrg(
         enableAutoJoiningByDomain = false,
         membersMustHaveMatchingDomain = false,
         maxUsers,
+        legacyOrgId,
     } = createOrgRequest
     const request: CreateOrgApiRequest = {
         name,
@@ -132,6 +137,9 @@ export function createOrg(
     }
     if (maxUsers) {
         request["max_users"] = maxUsers
+    }
+    if (legacyOrgId) {
+        request["legacy_org_id"] = legacyOrgId
     }
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
