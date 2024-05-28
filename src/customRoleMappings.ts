@@ -3,7 +3,7 @@ export type CustomRoleMappings = {
 }
 
 export type CustomRoleMapping = {
-    customRoleMappingId: string
+    customRoleMappingId: string | null
     customRoleMappingName: string
     numOrgsSubscribed: number
 }
