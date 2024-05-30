@@ -57,6 +57,7 @@ import {
     OrgQueryResponse,
     removeUserFromOrg,
     RemoveUserFromOrgRequest,
+    subscribeOrgToRoleMapping,
     updateOrg,
     UpdateOrgRequest,
 } from "./api/org"
@@ -252,6 +253,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return updateOrg(authUrl, integrationApiKey, updateOrgRequest)
     }
 
+    function subscribeOrgToRoleMappingWrapper(org_id: string, customRoleMappingId: string | null): Promise<boolean> {
+        return subscribeOrgToRoleMapping(authUrl, integrationApiKey, org_id, customRoleMappingId)
+    }
+
     function deleteOrgWrapper(orgId: string): Promise<boolean> {
         return deleteOrg(authUrl, integrationApiKey, orgId)
     }
@@ -342,6 +347,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         changeUserRoleInOrg: changeUserRoleInOrgWrapper,
         removeUserFromOrg: removeUserFromOrgWrapper,
         updateOrg: updateOrgWrapper,
+        subscribeOrgToRoleMapping: subscribeOrgToRoleMappingWrapper,
         deleteOrg: deleteOrgWrapper,
         allowOrgToSetupSamlConnection: allowOrgToSetupSamlConnectionWrapper,
         disallowOrgToSetupSamlConnection: disallowOrgToSetupSamlConnectionWrapper,

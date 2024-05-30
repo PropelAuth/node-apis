@@ -338,7 +338,6 @@ export type UpdateOrgRequest = {
     canJoinOnEmailDomainMatch?: boolean // In the backend, this is the `domain_autojoin` argument.
     membersMustHaveEmailDomainMatch?: boolean // In the backend, this is the `domain_restrict` argument.
     domain?: string
-    customRoleMappingId?: string | null
     // TODO: Add `require_2fa_by` optional argument.
 }
 
@@ -359,7 +358,6 @@ export function updateOrg(
         autojoin_by_domain: updateOrgRequest.canJoinOnEmailDomainMatch,
         restrict_to_domain: updateOrgRequest.membersMustHaveEmailDomainMatch,
         domain: updateOrgRequest.domain,
-        custom_role_mapping_id: updateOrgRequest.customRoleMappingId,
     }
     return httpRequest(
         authUrl,
@@ -376,6 +374,40 @@ export function updateOrg(
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
             throw new Error("Unknown error when updating org")
+        }
+
+        return true
+    })
+}
+
+export function subscribeOrgToRoleMapping(
+    authUrl: URL,
+    integrationApiKey: string,
+    orgId: string,
+    customRoleMappingId: string | null
+): Promise<boolean> {
+    if (!isValidId(orgId)) {
+        return Promise.resolve(false)
+    }
+
+    const request = {
+        custom_role_mapping_id: customRoleMappingId,
+    }
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${ENDPOINT_PATH}/${orgId}`,
+        "PUT",
+        JSON.stringify(request)
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 400) {
+            throw new UpdateOrgException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when subscribing an org to a role mapping")
         }
 
         return true
