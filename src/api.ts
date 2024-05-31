@@ -253,8 +253,8 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return updateOrg(authUrl, integrationApiKey, updateOrgRequest)
     }
 
-    function subscribeOrgToRoleMappingWrapper(org_id: string, customRoleMappingId: string | null): Promise<boolean> {
-        return subscribeOrgToRoleMapping(authUrl, integrationApiKey, org_id, customRoleMappingId)
+    function subscribeOrgToRoleMappingWrapper(org_id: string, customRoleMappingName: string): Promise<boolean> {
+        return subscribeOrgToRoleMapping(authUrl, integrationApiKey, org_id, customRoleMappingName)
     }
 
     function deleteOrgWrapper(orgId: string): Promise<boolean> {

@@ -117,7 +117,7 @@ export type CreateOrgRequest = {
     enableAutoJoiningByDomain?: boolean
     membersMustHaveMatchingDomain?: boolean
     maxUsers?: number
-    customRoleMappingId?: string
+    customRoleMappingName?: string
 }
 
 type CreateOrgApiRequest = {
@@ -126,7 +126,7 @@ type CreateOrgApiRequest = {
     enable_auto_joining_by_domain?: boolean
     members_must_have_matching_domain?: boolean
     max_users?: number
-    custom_role_mapping_id?: string
+    custom_role_mapping_name?: string
 }
 
 export function createOrg(
@@ -140,7 +140,7 @@ export function createOrg(
         enableAutoJoiningByDomain = false,
         membersMustHaveMatchingDomain = false,
         maxUsers,
-        customRoleMappingId,
+        customRoleMappingName,
     } = createOrgRequest
     const request: CreateOrgApiRequest = {
         name,
@@ -153,8 +153,8 @@ export function createOrg(
     if (maxUsers) {
         request["max_users"] = maxUsers
     }
-    if (customRoleMappingId) {
-        request["custom_role_mapping_id"] = customRoleMappingId
+    if (customRoleMappingName) {
+        request["custom_role_mapping_name"] = customRoleMappingName
     }
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
@@ -384,14 +384,14 @@ export function subscribeOrgToRoleMapping(
     authUrl: URL,
     integrationApiKey: string,
     orgId: string,
-    customRoleMappingId: string | null
+    customRoleMappingName: string | null
 ): Promise<boolean> {
     if (!isValidId(orgId)) {
         return Promise.resolve(false)
     }
 
     const request = {
-        custom_role_mapping_id: customRoleMappingId,
+        custom_role_mapping_name: customRoleMappingName,
     }
     return httpRequest(
         authUrl,
