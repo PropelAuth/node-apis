@@ -384,7 +384,7 @@ export function subscribeOrgToRoleMapping(
     authUrl: URL,
     integrationApiKey: string,
     orgId: string,
-    customRoleMappingName: string | null
+    customRoleMappingName: string
 ): Promise<boolean> {
     if (!isValidId(orgId)) {
         return Promise.resolve(false)
