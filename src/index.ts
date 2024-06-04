@@ -67,6 +67,6 @@ export type {
     InternalUser,
     InternalOrgMemberInfo,
 } from "./user"
-export { UserClass, OrgMemberInfo, toUser, toOrgIdToOrgMemberInfo } from "./user"
+export { UserClass, OrgMemberInfo, OrgRoleStructure, toUser, toOrgIdToOrgMemberInfo } from "./user"
 export { getApis } from "./api"
 export { parseSnakeCaseToCamelCase } from "./utils"
