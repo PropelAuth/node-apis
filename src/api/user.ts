@@ -288,7 +288,7 @@ export function resendEmailConfirmation(authUrl: URL, integrationApiKey: string,
     return httpRequest(
         authUrl,
         integrationApiKey,
-        `/api/backend/v1/resend_email_confirmation`,
+        "/api/backend/v1/resend_email_confirmation",
         "POST",
         JSON.stringify(request)
     ).then((httpResponse) => {
