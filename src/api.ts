@@ -20,6 +20,7 @@ import {
     disableUser2fa,
     disableUserCanCreateOrgs,
     enableUser,
+    resendEmailConfirmation,
     enableUserCanCreateOrgs,
     fetchBatchUserMetadata,
     fetchUserMetadataByQuery,
@@ -193,6 +194,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return disableUser2fa(authUrl, integrationApiKey, userId)
     }
 
+    function resendEmailConfirmationWrapper(userId: string): Promise<boolean> {
+        return resendEmailConfirmation(authUrl, integrationApiKey, userId)
+    }
+
     function updateUserEmailWrapper(userId: string, updateUserEmailRequest: UpdateUserEmailRequest): Promise<boolean> {
         return updateUserEmail(authUrl, integrationApiKey, userId, updateUserEmailRequest)
     }
@@ -327,6 +332,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         disableUser: disableUserWrapper,
         enableUser: enableUserWrapper,
         disableUser2fa: disableUser2faWrapper,
+        resendEmailConfirmation: resendEmailConfirmationWrapper,
         enableUserCanCreateOrgs: enableUserCanCreateOrgsWrapper,
         disableUserCanCreateOrgs: disableUserCanCreateOrgsWrapper,
         // org management functions
