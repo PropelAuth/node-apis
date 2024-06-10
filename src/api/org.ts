@@ -1,3 +1,4 @@
+import { CustomRoleMappings } from "../customRoleMappings"
 import {
     AddUserToOrgException,
     ChangeUserRoleInOrgException,
@@ -28,6 +29,22 @@ export function fetchOrg(authUrl: URL, integrationApiKey: string, orgId: string)
             )
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
             throw new Error("Unknown error when fetching org")
+        }
+
+        return parseSnakeCaseToCamelCase(httpResponse.response)
+    })
+}
+
+export function fetchCustomRoleMappings(authUrl: URL, integrationApiKey: string): Promise<CustomRoleMappings> {
+    return httpRequest(authUrl, integrationApiKey, "/api/backend/v1/custom_role_mappings", "GET").then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 426) {
+            throw new Error(
+                "Cannot use organizations unless B2B support is enabled. Enable it in your PropelAuth dashboard."
+            )
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when fetching custom role mappings")
         }
 
         return parseSnakeCaseToCamelCase(httpResponse.response)
@@ -100,6 +117,7 @@ export type CreateOrgRequest = {
     enableAutoJoiningByDomain?: boolean
     membersMustHaveMatchingDomain?: boolean
     maxUsers?: number
+    customRoleMappingName?: string
 }
 
 type CreateOrgApiRequest = {
@@ -108,6 +126,7 @@ type CreateOrgApiRequest = {
     enable_auto_joining_by_domain?: boolean
     members_must_have_matching_domain?: boolean
     max_users?: number
+    custom_role_mapping_name?: string
 }
 
 export function createOrg(
@@ -121,6 +140,7 @@ export function createOrg(
         enableAutoJoiningByDomain = false,
         membersMustHaveMatchingDomain = false,
         maxUsers,
+        customRoleMappingName,
     } = createOrgRequest
     const request: CreateOrgApiRequest = {
         name,
@@ -132,6 +152,9 @@ export function createOrg(
     }
     if (maxUsers) {
         request["max_users"] = maxUsers
+    }
+    if (customRoleMappingName) {
+        request["custom_role_mapping_name"] = customRoleMappingName
     }
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
@@ -351,6 +374,40 @@ export function updateOrg(
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
             throw new Error("Unknown error when updating org")
+        }
+
+        return true
+    })
+}
+
+export function subscribeOrgToRoleMapping(
+    authUrl: URL,
+    integrationApiKey: string,
+    orgId: string,
+    customRoleMappingName: string
+): Promise<boolean> {
+    if (!isValidId(orgId)) {
+        return Promise.resolve(false)
+    }
+
+    const request = {
+        custom_role_mapping_name: customRoleMappingName,
+    }
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${ENDPOINT_PATH}/${orgId}`,
+        "PUT",
+        JSON.stringify(request)
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 400) {
+            throw new UpdateOrgException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when subscribing an org to a role mapping")
         }
 
         return true

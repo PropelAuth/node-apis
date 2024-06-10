@@ -51,12 +51,14 @@ import {
     CreateOrgRequest,
     deleteOrg,
     disallowOrgToSetupSamlConnection,
+    fetchCustomRoleMappings,
     fetchOrg,
     fetchOrgByQuery,
     OrgQuery,
     OrgQueryResponse,
     removeUserFromOrg,
     RemoveUserFromOrgRequest,
+    subscribeOrgToRoleMapping,
     updateOrg,
     UpdateOrgRequest,
 } from "./api/org"
@@ -77,6 +79,7 @@ import {
 } from "./api/endUserApiKeys"
 import { validateOrgApiKey, validatePersonalApiKey } from "./validators"
 import { TokenVerificationMetadata, fetchTokenVerificationMetadata } from "./api/tokenVerificationMetadata"
+import { CustomRoleMappings } from "./customRoleMappings"
 
 export function getApis(authUrl: URL, integrationApiKey: string) {
     function fetchTokenVerificationMetadataWrapper(): Promise<TokenVerificationMetadata> {
@@ -149,6 +152,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
 
     function fetchOrgsByQueryWrapper(orgQuery: OrgQuery): Promise<OrgQueryResponse> {
         return fetchOrgByQuery(authUrl, integrationApiKey, orgQuery)
+    }
+
+    function fetchCustomRoleMappingsWrapper(): Promise<CustomRoleMappings> {
+        return fetchCustomRoleMappings(authUrl, integrationApiKey)
     }
 
     function fetchUsersByQueryWrapper(usersQuery: UsersQuery): Promise<UsersPagedResponse> {
@@ -251,6 +258,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return updateOrg(authUrl, integrationApiKey, updateOrgRequest)
     }
 
+    function subscribeOrgToRoleMappingWrapper(orgId: string, customRoleMappingName: string): Promise<boolean> {
+        return subscribeOrgToRoleMapping(authUrl, integrationApiKey, orgId, customRoleMappingName)
+    }
+
     function deleteOrgWrapper(orgId: string): Promise<boolean> {
         return deleteOrg(authUrl, integrationApiKey, orgId)
     }
@@ -315,6 +326,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         fetchBatchUserMetadataByUsernames,
         fetchOrg: fetchOrgWrapper,
         fetchOrgByQuery: fetchOrgsByQueryWrapper,
+        fetchCustomRoleMappings: fetchCustomRoleMappingsWrapper,
         fetchUsersByQuery: fetchUsersByQueryWrapper,
         fetchUsersInOrg: fetchUsersInOrgWrapper,
         fetchUserSignupQueryParams: fetchUserSignupQueryParamsWrapper,
@@ -341,6 +353,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         changeUserRoleInOrg: changeUserRoleInOrgWrapper,
         removeUserFromOrg: removeUserFromOrgWrapper,
         updateOrg: updateOrgWrapper,
+        subscribeOrgToRoleMapping: subscribeOrgToRoleMappingWrapper,
         deleteOrg: deleteOrgWrapper,
         allowOrgToSetupSamlConnection: allowOrgToSetupSamlConnectionWrapper,
         disallowOrgToSetupSamlConnection: disallowOrgToSetupSamlConnectionWrapper,
