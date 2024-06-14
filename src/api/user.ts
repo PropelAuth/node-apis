@@ -344,6 +344,26 @@ export function inviteUserToOrg(
     )
 }
 
+export function logoutAllUserSessions(authUrl: URL, integrationApiKey: string, userId: string): Promise<boolean> {
+    if (!isValidId(userId)) {
+        return Promise.resolve(false)
+    }
+
+    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${userId}/logout_all_sessions`, "POST").then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 404) {
+                return false
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when logging out all sessions")
+            }
+
+            return true
+        }
+    )
+}
+
 // PUT/PATCH
 export type UpdateUserMetadataRequest = {
     username?: string
