@@ -20,6 +20,7 @@ export type MigrateUserFromExternalSourceRequest = {
     firstName?: string
     lastName?: string
     username?: string
+    pictureUrl?: string
     properties?: { [key: string]: any }
 }
 
@@ -28,21 +29,36 @@ export function migrateUserFromExternalSource(
     integrationApiKey: string,
     migrateUserFromExternalSourceRequest: MigrateUserFromExternalSourceRequest
 ): Promise<CreatedUser> {
+    const {
+        email,
+        emailConfirmed: email_confirmed,
+        existingUserId: existing_user_id,
+        existingPasswordHash: existing_password_hash,
+        existingMfaBase32EncodedSecret: existing_mfa_base32_encoded_secret,
+        askUserToUpdatePasswordOnLogin: update_password_required,
+        enabled,
+        firstName: first_name,
+        lastName: last_name,
+        username,
+        pictureUrl: picture_url,
+        properties,
+    } = migrateUserFromExternalSourceRequest
     const request = {
-        email: migrateUserFromExternalSourceRequest.email,
-        email_confirmed: migrateUserFromExternalSourceRequest.emailConfirmed,
+        email,
+        email_confirmed,
 
-        existing_user_id: migrateUserFromExternalSourceRequest.existingUserId,
-        existing_password_hash: migrateUserFromExternalSourceRequest.existingPasswordHash,
-        existing_mfa_base32_encoded_secret: migrateUserFromExternalSourceRequest.existingMfaBase32EncodedSecret,
-        update_password_required: migrateUserFromExternalSourceRequest.askUserToUpdatePasswordOnLogin,
+        existing_user_id,
+        existing_password_hash,
+        existing_mfa_base32_encoded_secret,
+        update_password_required,
 
-        enabled: migrateUserFromExternalSourceRequest.enabled,
+        enabled,
 
-        first_name: migrateUserFromExternalSourceRequest.firstName,
-        last_name: migrateUserFromExternalSourceRequest.lastName,
-        username: migrateUserFromExternalSourceRequest.username,
-        properties: migrateUserFromExternalSourceRequest.properties,
+        first_name,
+        last_name,
+        username,
+        picture_url,
+        properties,
     }
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
