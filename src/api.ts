@@ -286,7 +286,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return logoutAllUserSessions(authUrl, integrationApiKey, userId)
     }
 
-    function fetchPendingInvitesWrapper(params: FetchPendingInvitesParams): Promise<PendingInvitesPage> {
+    function fetchPendingInvitesWrapper(params?: FetchPendingInvitesParams): Promise<PendingInvitesPage> {
         return fetchPendingInvites(authUrl, integrationApiKey, params)
     }
 
