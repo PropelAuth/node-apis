@@ -41,6 +41,45 @@ test("parseSnakeCaseToCamelCase converts correctly", async () => {
     }
 
     expect(parseSnakeCaseToCamelCase(JSON.stringify(snakeCase))).toEqual(camelCase)
+
+    const snakeCaseJson = {
+        first_name: "John",
+        last_name: "Doe",
+        contact_info: {
+            email_address: "john.doe@example.com",
+            phone_number: "123-456-7890",
+        },
+        hobbies: [
+            {
+                hobby_name: "Reading",
+                hobby_level: "Intermediate",
+            },
+            {
+                hobby_name: "Swimming",
+                hobby_level: "Advanced",
+            },
+        ],
+    }
+    const camelCaseJson = {
+        firstName: "John",
+        lastName: "Doe",
+        contactInfo: {
+            emailAddress: "john.doe@example.com",
+            phoneNumber: "123-456-7890",
+        },
+        hobbies: [
+            {
+                hobbyName: "Reading",
+                hobbyLevel: "Intermediate",
+            },
+            {
+                hobbyName: "Swimming",
+                hobbyLevel: "Advanced",
+            },
+        ],
+    }
+
+    expect(parseSnakeCaseToCamelCase(JSON.stringify(snakeCaseJson))).toEqual(camelCaseJson)
 })
 
 test("parseSnakeCaseToCamelCase adds functions to orgMemberInfo", async () => {

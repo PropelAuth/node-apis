@@ -36,7 +36,63 @@ export function fetchOrg(authUrl: URL, integrationApiKey: string, orgId: string)
 }
 
 export function fetchCustomRoleMappings(authUrl: URL, integrationApiKey: string): Promise<CustomRoleMappings> {
-    return httpRequest(authUrl, integrationApiKey, "/api/backend/v1/custom_role_mappings", "GET").then((httpResponse) => {
+    return httpRequest(authUrl, integrationApiKey, "/api/backend/v1/custom_role_mappings", "GET").then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 426) {
+                throw new Error(
+                    "Cannot use organizations unless B2B support is enabled. Enable it in your PropelAuth dashboard."
+                )
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when fetching custom role mappings")
+            }
+
+            return parseSnakeCaseToCamelCase(httpResponse.response)
+        }
+    )
+}
+
+export type FetchPendingInvitesParams = {
+    orgId?: string
+    pageSize?: number
+    pageNumber?: number
+}
+export type PendingInvite = {
+    inviteeEmail: string
+    orgId: string
+    orgName: string
+    roleInOrg: string
+    additionalRolesInOrg: string[]
+    createdAt: number
+    expiresAt: number
+    inviterEmail?: string
+    inviterUserId?: string
+}
+export type PendingInvitesPage = {
+    totalInvites: number
+    currentPage: number
+    pageSize: number
+    hasMoreResults: boolean
+    invites: PendingInvite[]
+}
+export function fetchPendingInvites(
+    authUrl: URL,
+    integrationApiKey: string,
+    params?: FetchPendingInvitesParams
+): Promise<PendingInvitesPage> {
+    const queryParams = new URLSearchParams()
+    if (params?.orgId) {
+        queryParams.set("org_id", params.orgId)
+    }
+    if (params?.pageSize) {
+        queryParams.set("page_size", params.pageSize.toString())
+    }
+    if (params?.pageNumber) {
+        queryParams.set("page_number", params.pageNumber.toString())
+    }
+    const path = `/api/backend/v1/pending_org_invites?${queryParams.toString()}`
+    return httpRequest(authUrl, integrationApiKey, path, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
         } else if (httpResponse.statusCode === 426) {
@@ -401,25 +457,21 @@ export function subscribeOrgToRoleMapping(
     const request = {
         custom_role_mapping_name: customRoleMappingName,
     }
-    return httpRequest(
-        authUrl,
-        integrationApiKey,
-        `${ENDPOINT_PATH}/${orgId}`,
-        "PUT",
-        JSON.stringify(request)
-    ).then((httpResponse) => {
-        if (httpResponse.statusCode === 401) {
-            throw new Error("integrationApiKey is incorrect")
-        } else if (httpResponse.statusCode === 400) {
-            throw new UpdateOrgException(httpResponse.response)
-        } else if (httpResponse.statusCode === 404) {
-            return false
-        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
-            throw new Error("Unknown error when subscribing an org to a role mapping")
-        }
+    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${orgId}`, "PUT", JSON.stringify(request)).then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 400) {
+                throw new UpdateOrgException(httpResponse.response)
+            } else if (httpResponse.statusCode === 404) {
+                return false
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when subscribing an org to a role mapping")
+            }
 
-        return true
-    })
+            return true
+        }
+    )
 }
 
 // DELETE
