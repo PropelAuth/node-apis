@@ -48,6 +48,7 @@ export {
     UpdateUserPasswordException,
 } from "./exceptions"
 export type { SocialLoginProvider, SamlLoginProvider, LoginMethod } from "./loginMethod"
+export type { CustomRoleMappings, CustomRoleMapping } from "./customRoleMappings"
 export type {
     UserProperties,
     User,

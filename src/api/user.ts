@@ -276,6 +276,38 @@ export function disableUser2fa(authUrl: URL, integrationApiKey: string, userId: 
     )
 }
 
+export function resendEmailConfirmation(authUrl: URL, integrationApiKey: string, userId: string): Promise<boolean> {
+    if (!isValidId(userId)) {
+        return Promise.resolve(false)
+    }
+
+    const request = {
+        user_id: userId,
+    }
+
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        "/api/backend/v1/resend_email_confirmation",
+        "POST",
+        JSON.stringify(request)
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode === 429) {
+            throw new Error("Rate limited when resending email confirmation")
+        } else if (httpResponse.statusCode === 400) {
+            throw new BadRequestException(httpResponse.response)
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when resending email confirmation")
+        }
+
+        return true
+    })
+}
+
 export type InviteUserToOrgRequest = {
     orgId: string
     email: string
