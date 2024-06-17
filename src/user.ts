@@ -156,6 +156,7 @@ export type Org = {
     name: string
     maxUsers?: number
     isSamlConfigured: boolean
+    legacyOrgId?: string
     metadata: { [key: string]: any }
     customRoleMappingName?: string
 }
@@ -173,6 +174,7 @@ export type Organization = {
     domainAutojoin: boolean
     domainRestrict: boolean
     customRoleMappingName?: string
+    legacyOrgId?: string
 }
 
 export type CreatedOrg = {

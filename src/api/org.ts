@@ -95,6 +95,8 @@ export function fetchOrgByQuery(authUrl: URL, integrationApiKey: string, query: 
                     this.name = value
                 } else if (key === "max_users") {
                     this.maxUsers = value
+                } else if (key === "legacy_org_id") {
+                    this.legacyOrgId = value
                 } else if (key === "total_orgs") {
                     this.totalOrgs = value
                 } else if (key === "current_page") {
@@ -118,6 +120,7 @@ export type CreateOrgRequest = {
     membersMustHaveMatchingDomain?: boolean
     maxUsers?: number
     customRoleMappingName?: string
+    legacyOrgId?: string
 }
 
 type CreateOrgApiRequest = {
@@ -127,6 +130,7 @@ type CreateOrgApiRequest = {
     members_must_have_matching_domain?: boolean
     max_users?: number
     custom_role_mapping_name?: string
+    legacy_org_id?: string
 }
 
 export function createOrg(
@@ -141,6 +145,7 @@ export function createOrg(
         membersMustHaveMatchingDomain = false,
         maxUsers,
         customRoleMappingName,
+        legacyOrgId,
     } = createOrgRequest
     const request: CreateOrgApiRequest = {
         name,
@@ -152,6 +157,9 @@ export function createOrg(
     }
     if (maxUsers) {
         request["max_users"] = maxUsers
+    }
+    if (legacyOrgId) {
+        request["legacy_org_id"] = legacyOrgId
     }
     if (customRoleMappingName) {
         request["custom_role_mapping_name"] = customRoleMappingName
