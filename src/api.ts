@@ -40,6 +40,7 @@ import {
     UsersInOrgQuery,
     UsersPagedResponse,
     UsersQuery,
+    logoutAllUserSessions,
 } from "./api/user"
 import {
     addUserToOrg,
@@ -278,6 +279,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return inviteUserToOrg(authUrl, integrationApiKey, inviteUserToOrgRequest)
     }
 
+    function logoutAllUserSessionsWrapper(userId: string): Promise<boolean> {
+        return logoutAllUserSessions(authUrl, integrationApiKey, userId)
+    }
+
     // end user api key wrappers
     function fetchApiKeyWrapper(apiKeyId: string): Promise<ApiKeyFull> {
         return fetchApiKey(authUrl, integrationApiKey, apiKeyId)
@@ -347,6 +352,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         resendEmailConfirmation: resendEmailConfirmationWrapper,
         enableUserCanCreateOrgs: enableUserCanCreateOrgsWrapper,
         disableUserCanCreateOrgs: disableUserCanCreateOrgsWrapper,
+        logoutAllUserSessions: logoutAllUserSessionsWrapper,
         // org management functions
         createOrg: createOrgWrapper,
         addUserToOrg: addUserToOrgWrapper,
