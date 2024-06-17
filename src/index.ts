@@ -8,6 +8,9 @@ export type {
     ChangeUserRoleInOrgRequest,
     RemoveUserFromOrgRequest,
     UpdateOrgRequest,
+    FetchPendingInvitesParams,
+    PendingInvitesPage,
+    PendingInvite,
 } from "./api/org"
 export type { TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 export type {

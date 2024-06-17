@@ -55,8 +55,11 @@ import {
     fetchCustomRoleMappings,
     fetchOrg,
     fetchOrgByQuery,
+    fetchPendingInvites,
+    FetchPendingInvitesParams,
     OrgQuery,
     OrgQueryResponse,
+    PendingInvitesPage,
     removeUserFromOrg,
     RemoveUserFromOrgRequest,
     subscribeOrgToRoleMapping,
@@ -283,6 +286,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return logoutAllUserSessions(authUrl, integrationApiKey, userId)
     }
 
+    function fetchPendingInvitesWrapper(params: FetchPendingInvitesParams): Promise<PendingInvitesPage> {
+        return fetchPendingInvites(authUrl, integrationApiKey, params)
+    }
+
     // end user api key wrappers
     function fetchApiKeyWrapper(apiKeyId: string): Promise<ApiKeyFull> {
         return fetchApiKey(authUrl, integrationApiKey, apiKeyId)
@@ -364,6 +371,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         allowOrgToSetupSamlConnection: allowOrgToSetupSamlConnectionWrapper,
         disallowOrgToSetupSamlConnection: disallowOrgToSetupSamlConnectionWrapper,
         inviteUserToOrg: inviteUserToOrgWrapper,
+        fetchPendingInvites: fetchPendingInvitesWrapper,
         // api keys functions
         fetchApiKey: fetchApiKeyWrapper,
         fetchCurrentApiKeys: fetchCurrentApiKeysWrapper,
