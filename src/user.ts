@@ -222,6 +222,7 @@ export class OrgMemberInfo {
     public readonly orgMetadata: { [key: string]: unknown }
     public readonly urlSafeOrgName: string
     public readonly orgRoleStructure: OrgRoleStructure
+    public readonly legacyOrgId?: string
 
     public readonly userAssignedRole: string
     public readonly userInheritedRolesPlusCurrentRole: string[]
@@ -237,7 +238,8 @@ export class OrgMemberInfo {
         userInheritedRolesPlusCurrentRole: string[],
         userPermissions: string[],
         orgRoleStructure?: OrgRoleStructure,
-        userAssignedAdditionalRoles?: string[]
+        userAssignedAdditionalRoles?: string[],
+        legacyOrgId?: string
     ) {
         this.orgId = orgId
         this.orgName = orgName
@@ -249,6 +251,8 @@ export class OrgMemberInfo {
         this.userInheritedRolesPlusCurrentRole = userInheritedRolesPlusCurrentRole
         this.userPermissions = userPermissions
         this.userAssignedAdditionalRoles = userAssignedAdditionalRoles ?? []
+
+        this.legacyOrgId = legacyOrgId
     }
 
     // getters
@@ -301,7 +305,8 @@ export class OrgMemberInfo {
                 obj.userInheritedRolesPlusCurrentRole,
                 obj.userPermissions,
                 obj.orgRoleStructure,
-                obj.userAssignedAdditionalRoles
+                obj.userAssignedAdditionalRoles,
+                obj.legacyOrgId
             )
         } catch (e) {
             console.error(
@@ -339,6 +344,7 @@ export type InternalOrgMemberInfo = {
     inherited_user_roles_plus_current_role: string[]
     user_permissions: string[]
     additional_roles: string[]
+    legacy_org_id?: string
 }
 
 // This type is used to represent the user returned from the refresh token.
@@ -411,7 +417,8 @@ export function toOrgIdToOrgMemberInfo(snake_case?: {
                 snakeCaseValue.inherited_user_roles_plus_current_role,
                 snakeCaseValue.user_permissions,
                 snakeCaseValue.org_role_structure,
-                snakeCaseValue.additional_roles
+                snakeCaseValue.additional_roles,
+                snakeCaseValue.legacy_org_id
             )
         }
     }

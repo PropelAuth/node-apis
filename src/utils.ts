@@ -75,7 +75,8 @@ function processKeys(obj: any): any {
                 value["userInheritedRolesPlusCurrentRole"],
                 value["userPermissions"],
                 value["orgRoleStructure"],
-                value["userAssignedAdditionalRoles"]
+                value["userAssignedAdditionalRoles"],
+                value["legacyOrgId"]
             )
         }
 
