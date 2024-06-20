@@ -4,7 +4,7 @@
         "type": "git",
         "url": "https://github.com/PropelAuth/node-apis"
     },
-    "version": "2.1.15",
+    "version": "2.1.19",
     "license": "MIT",
     "keywords": [
         "auth",
