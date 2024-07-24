@@ -6,7 +6,7 @@ const ENDPOINT_PATH = "/api/backend/v1/magic_link"
 export type CreateMagicLinkRequest = {
     email: string
     redirectToUrl?: string
-    expiresInHours?: string
+    expiresInHours?: number
     createNewUserIfOneDoesntExist?: boolean
 }
 
