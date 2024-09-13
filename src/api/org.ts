@@ -5,6 +5,7 @@ import {
     CreateOrgException,
     RemoveUserFromOrgException,
     UpdateOrgException,
+    RevokePendingOrgInviteException
 } from "../exceptions"
 import { httpRequest } from "../http"
 import { CreatedOrg, Org, Organization } from "../user"
@@ -487,6 +488,35 @@ export function deleteOrg(authUrl: URL, integrationApiKey: string, orgId: string
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
             throw new Error("Unknown error when deleting org")
+        }
+
+        return true
+    })
+}
+
+export type RevokePendingOrgInviteRequest = {
+    inviteeEmail: string
+    orgId: string
+}
+
+export function revokePendingOrgInvite(
+    authUrl: URL, 
+    integrationApiKey: string,
+    revokePendingOrgInviteRequest: RevokePendingOrgInviteRequest
+): Promise<boolean> {
+    const request = {
+        invitee_email: revokePendingOrgInviteRequest.inviteeEmail,
+        org_id: revokePendingOrgInviteRequest.orgId
+    }
+    return httpRequest(authUrl, integrationApiKey, `/api/backend/v1/pending_org_invites`, "DELETE", JSON.stringify(request)).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 400) {
+            throw new RevokePendingOrgInviteException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when revoking org invite")
         }
 
         return true
