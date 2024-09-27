@@ -114,6 +114,7 @@ export type OrgQuery = {
     pageNumber?: number
     orderBy?: "CREATED_AT_ASC" | "CREATED_AT_DESC" | "NAME"
     name?: string
+    legacyOrgId?: string
 }
 
 export type OrgQueryResponse = {
@@ -130,6 +131,7 @@ export function fetchOrgByQuery(authUrl: URL, integrationApiKey: string, query: 
         page_number: query.pageNumber,
         order_by: query.orderBy,
         name: query.name,
+        legacy_org_id: query.legacyOrgId,
     }
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/query`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
@@ -403,6 +405,7 @@ export type UpdateOrgRequest = {
     canJoinOnEmailDomainMatch?: boolean // In the backend, this is the `domain_autojoin` argument.
     membersMustHaveEmailDomainMatch?: boolean // In the backend, this is the `domain_restrict` argument.
     domain?: string
+    legacyOrgId?: string
     // TODO: Add `require_2fa_by` optional argument.
 }
 
@@ -423,6 +426,7 @@ export function updateOrg(
         autojoin_by_domain: updateOrgRequest.canJoinOnEmailDomainMatch,
         restrict_to_domain: updateOrgRequest.membersMustHaveEmailDomainMatch,
         domain: updateOrgRequest.domain,
+        legacy_org_id: updateOrgRequest.legacyOrgId,
     }
     return httpRequest(
         authUrl,
