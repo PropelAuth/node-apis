@@ -11,6 +11,7 @@ export type {
     FetchPendingInvitesParams,
     PendingInvitesPage,
     PendingInvite,
+    RevokePendingOrgInviteRequest
 } from "./api/org"
 export type { TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 export type {

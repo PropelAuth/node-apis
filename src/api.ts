@@ -65,6 +65,8 @@ import {
     subscribeOrgToRoleMapping,
     updateOrg,
     UpdateOrgRequest,
+    RevokePendingOrgInviteRequest,
+    revokePendingOrgInvite
 } from "./api/org"
 import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
 import { AccessToken, createAccessToken, CreateAccessTokenRequest } from "./api/accessToken"
@@ -290,6 +292,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return fetchPendingInvites(authUrl, integrationApiKey, params)
     }
 
+    function revokePendingOrgInviteWrapper(revokePendingOrgInviteRequest: RevokePendingOrgInviteRequest): Promise<boolean> {
+        return revokePendingOrgInvite(authUrl, integrationApiKey, revokePendingOrgInviteRequest)
+    }
+
     // end user api key wrappers
     function fetchApiKeyWrapper(apiKeyId: string): Promise<ApiKeyFull> {
         return fetchApiKey(authUrl, integrationApiKey, apiKeyId)
@@ -372,6 +378,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         disallowOrgToSetupSamlConnection: disallowOrgToSetupSamlConnectionWrapper,
         inviteUserToOrg: inviteUserToOrgWrapper,
         fetchPendingInvites: fetchPendingInvitesWrapper,
+        revokePendingOrgInvite: revokePendingOrgInviteWrapper,
         // api keys functions
         fetchApiKey: fetchApiKeyWrapper,
         fetchCurrentApiKeys: fetchCurrentApiKeysWrapper,
