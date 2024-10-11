@@ -1,76 +1,4 @@
-import {
-    ApiKeyFull,
-    ApiKeyNew,
-    ApiKeyResultPage,
-    ApiKeyValidation,
-    CreatedOrg,
-    CreatedUser,
-    Org,
-    OrgApiKeyValidation,
-    Organization,
-    PersonalApiKeyValidation,
-    UserMetadata,
-} from "./user"
-import {
-    clearUserPassword,
-    createUser,
-    CreateUserRequest,
-    deleteUser,
-    disableUser,
-    disableUser2fa,
-    disableUserCanCreateOrgs,
-    enableUser,
-    resendEmailConfirmation,
-    enableUserCanCreateOrgs,
-    fetchBatchUserMetadata,
-    fetchUserMetadataByQuery,
-    fetchUserMetadataByUserIdWithIdCheck,
-    fetchUsersByQuery,
-    fetchUserSignupQueryParams,
-    fetchUsersInOrg,
-    inviteUserToOrg,
-    InviteUserToOrgRequest,
-    updateUserEmail,
-    UpdateUserEmailRequest,
-    updateUserMetadata,
-    UpdateUserMetadataRequest,
-    updateUserPassword,
-    UpdateUserPasswordRequest,
-    UserSignupQueryParams,
-    UsersInOrgQuery,
-    UsersPagedResponse,
-    UsersQuery,
-    logoutAllUserSessions,
-} from "./api/user"
-import {
-    addUserToOrg,
-    AddUserToOrgRequest,
-    allowOrgToSetupSamlConnection,
-    changeUserRoleInOrg,
-    ChangeUserRoleInOrgRequest,
-    createOrg,
-    CreateOrgRequest,
-    deleteOrg,
-    disallowOrgToSetupSamlConnection,
-    fetchCustomRoleMappings,
-    fetchOrg,
-    fetchOrgByQuery,
-    fetchPendingInvites,
-    FetchPendingInvitesParams,
-    OrgQuery,
-    OrgQueryResponse,
-    PendingInvitesPage,
-    removeUserFromOrg,
-    RemoveUserFromOrgRequest,
-    subscribeOrgToRoleMapping,
-    updateOrg,
-    UpdateOrgRequest,
-    RevokePendingOrgInviteRequest,
-    revokePendingOrgInvite
-} from "./api/org"
-import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
 import { AccessToken, createAccessToken, CreateAccessTokenRequest } from "./api/accessToken"
-import { migrateUserFromExternalSource, MigrateUserFromExternalSourceRequest } from "./api/migrateUser"
 import {
     ApiKeysCreateRequest,
     ApiKeysQueryRequest,
@@ -83,9 +11,82 @@ import {
     updateApiKey,
     validateApiKey,
 } from "./api/endUserApiKeys"
-import { validateOrgApiKey, validatePersonalApiKey } from "./validators"
-import { TokenVerificationMetadata, fetchTokenVerificationMetadata } from "./api/tokenVerificationMetadata"
+import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
+import { migrateUserFromExternalSource, MigrateUserFromExternalSourceRequest } from "./api/migrateUser"
+import {
+    addUserToOrg,
+    AddUserToOrgRequest,
+    allowOrgToSetupSamlConnection,
+    changeUserRoleInOrg,
+    ChangeUserRoleInOrgRequest,
+    createOrg,
+    CreateOrgRequest,
+    createOrgSamlConnectionLink,
+    CreateSamlConnectionLinkResponse,
+    deleteOrg,
+    disallowOrgToSetupSamlConnection,
+    fetchCustomRoleMappings,
+    fetchOrg,
+    fetchOrgByQuery,
+    fetchPendingInvites,
+    FetchPendingInvitesParams,
+    OrgQuery,
+    OrgQueryResponse,
+    PendingInvitesPage,
+    removeUserFromOrg,
+    RemoveUserFromOrgRequest,
+    revokePendingOrgInvite,
+    RevokePendingOrgInviteRequest,
+    subscribeOrgToRoleMapping,
+    updateOrg,
+    UpdateOrgRequest,
+} from "./api/org"
+import { fetchTokenVerificationMetadata, TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
+import {
+    clearUserPassword,
+    createUser,
+    CreateUserRequest,
+    deleteUser,
+    disableUser,
+    disableUser2fa,
+    disableUserCanCreateOrgs,
+    enableUser,
+    enableUserCanCreateOrgs,
+    fetchBatchUserMetadata,
+    fetchUserMetadataByQuery,
+    fetchUserMetadataByUserIdWithIdCheck,
+    fetchUsersByQuery,
+    fetchUserSignupQueryParams,
+    fetchUsersInOrg,
+    inviteUserToOrg,
+    InviteUserToOrgRequest,
+    logoutAllUserSessions,
+    resendEmailConfirmation,
+    updateUserEmail,
+    UpdateUserEmailRequest,
+    updateUserMetadata,
+    UpdateUserMetadataRequest,
+    updateUserPassword,
+    UpdateUserPasswordRequest,
+    UserSignupQueryParams,
+    UsersInOrgQuery,
+    UsersPagedResponse,
+    UsersQuery,
+} from "./api/user"
 import { CustomRoleMappings } from "./customRoleMappings"
+import {
+    ApiKeyFull,
+    ApiKeyNew,
+    ApiKeyResultPage,
+    ApiKeyValidation,
+    CreatedOrg,
+    CreatedUser,
+    Organization,
+    OrgApiKeyValidation,
+    PersonalApiKeyValidation,
+    UserMetadata,
+} from "./user"
+import { validateOrgApiKey, validatePersonalApiKey } from "./validators"
 
 export function getApis(authUrl: URL, integrationApiKey: string) {
     function fetchTokenVerificationMetadataWrapper(): Promise<TokenVerificationMetadata> {
@@ -280,6 +281,13 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return disallowOrgToSetupSamlConnection(authUrl, integrationApiKey, orgId)
     }
 
+    function createOrgSamlConnectionLinkWrapper(
+        orgId: string,
+        expiresInSeconds?: number
+    ): Promise<CreateSamlConnectionLinkResponse> {
+        return createOrgSamlConnectionLink(authUrl, integrationApiKey, orgId, expiresInSeconds)
+    }
+
     function inviteUserToOrgWrapper(inviteUserToOrgRequest: InviteUserToOrgRequest): Promise<boolean> {
         return inviteUserToOrg(authUrl, integrationApiKey, inviteUserToOrgRequest)
     }
@@ -292,7 +300,9 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return fetchPendingInvites(authUrl, integrationApiKey, params)
     }
 
-    function revokePendingOrgInviteWrapper(revokePendingOrgInviteRequest: RevokePendingOrgInviteRequest): Promise<boolean> {
+    function revokePendingOrgInviteWrapper(
+        revokePendingOrgInviteRequest: RevokePendingOrgInviteRequest
+    ): Promise<boolean> {
         return revokePendingOrgInvite(authUrl, integrationApiKey, revokePendingOrgInviteRequest)
     }
 
@@ -376,6 +386,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         deleteOrg: deleteOrgWrapper,
         allowOrgToSetupSamlConnection: allowOrgToSetupSamlConnectionWrapper,
         disallowOrgToSetupSamlConnection: disallowOrgToSetupSamlConnectionWrapper,
+        createOrgSamlConnectionLink: createOrgSamlConnectionLinkWrapper,
         inviteUserToOrg: inviteUserToOrgWrapper,
         fetchPendingInvites: fetchPendingInvitesWrapper,
         revokePendingOrgInvite: revokePendingOrgInviteWrapper,
