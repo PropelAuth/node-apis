@@ -4,8 +4,8 @@ import {
     ChangeUserRoleInOrgException,
     CreateOrgException,
     RemoveUserFromOrgException,
+    RevokePendingOrgInviteException,
     UpdateOrgException,
-    RevokePendingOrgInviteException
 } from "../exceptions"
 import { httpRequest } from "../http"
 import { CreatedOrg, Org, Organization } from "../user"
@@ -395,6 +395,42 @@ export function disallowOrgToSetupSamlConnection(
     )
 }
 
+export type CreateSamlConnectionLinkResponse = {
+    url: string
+}
+
+export async function createOrgSamlConnectionLink(
+    authUrl: URL,
+    integrationApiKey: string,
+    orgId: string,
+    expiresInSeconds?: number
+): Promise<CreateSamlConnectionLinkResponse> {
+    if (!isValidId(orgId)) {
+        return Promise.reject(new Error("Invalid orgId"))
+    }
+
+    const request = {
+        expires_in_seconds: expiresInSeconds,
+    }
+
+    const response = await httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${ENDPOINT_PATH}/${orgId}/create_saml_connection_link`,
+        "POST",
+        JSON.stringify(request)
+    )
+    if (response.statusCode === 401) {
+        throw new Error("integrationApiKey is incorrect")
+    } else if (response.statusCode === 404) {
+        throw new Error("Org not found")
+    } else if (response.statusCode && response.statusCode >= 400) {
+        throw new Error(`Error when creating SAML connection link: ${response.response}`)
+    }
+
+    return JSON.parse(response.response)
+}
+
 // PUT/PATCH
 export type UpdateOrgRequest = {
     orgId: string
@@ -504,15 +540,21 @@ export type RevokePendingOrgInviteRequest = {
 }
 
 export function revokePendingOrgInvite(
-    authUrl: URL, 
+    authUrl: URL,
     integrationApiKey: string,
     revokePendingOrgInviteRequest: RevokePendingOrgInviteRequest
 ): Promise<boolean> {
     const request = {
         invitee_email: revokePendingOrgInviteRequest.inviteeEmail,
-        org_id: revokePendingOrgInviteRequest.orgId
+        org_id: revokePendingOrgInviteRequest.orgId,
     }
-    return httpRequest(authUrl, integrationApiKey, `/api/backend/v1/pending_org_invites`, "DELETE", JSON.stringify(request)).then((httpResponse) => {
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `/api/backend/v1/pending_org_invites`,
+        "DELETE",
+        JSON.stringify(request)
+    ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
         } else if (httpResponse.statusCode === 400) {

@@ -7,11 +7,11 @@ export function httpRequest(
     authUrlOrigin: URL,
     apiKey: string,
     path: string,
-    method: string,
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
     body?: string
 ): Promise<HttpResponse> {
     let headers: any = {
-        "Authorization": "Bearer " + apiKey,
+        Authorization: "Bearer " + apiKey,
         "Content-Type": "application/json",
     }
 
@@ -19,8 +19,8 @@ export function httpRequest(
         method,
         headers,
         body,
-    }).then(response => {
-        return response.text().then(res => {
+    }).then((response) => {
+        return response.text().then((res) => {
             return {
                 statusCode: response.status,
                 response: res,
