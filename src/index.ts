@@ -4,6 +4,7 @@ export type {
     OrgQuery,
     OrgQueryResponse,
     CreateOrgRequest,
+    CreateSamlConnectionLinkResponse,
     AddUserToOrgRequest,
     ChangeUserRoleInOrgRequest,
     RemoveUserFromOrgRequest,
@@ -11,7 +12,7 @@ export type {
     FetchPendingInvitesParams,
     PendingInvitesPage,
     PendingInvite,
-    RevokePendingOrgInviteRequest
+    RevokePendingOrgInviteRequest,
 } from "./api/org"
 export type { TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 export type {
