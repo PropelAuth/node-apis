@@ -24,12 +24,15 @@ import {
     createOrgSamlConnectionLink,
     CreateSamlConnectionLinkResponse,
     deleteOrg,
+    deleteSamlConnection,
     disallowOrgToSetupSamlConnection,
     fetchCustomRoleMappings,
     fetchOrg,
     fetchOrgByQuery,
     fetchPendingInvites,
     FetchPendingInvitesParams,
+    fetchSamlSpMetadata,
+    FetchSamlSpMetadataResponse,
     OrgQuery,
     OrgQueryResponse,
     PendingInvitesPage,
@@ -37,6 +40,9 @@ import {
     RemoveUserFromOrgRequest,
     revokePendingOrgInvite,
     RevokePendingOrgInviteRequest,
+    samlGoLive,
+    setSamlIdpMetadata,
+    SetSamlIdpMetadataRequest,
     subscribeOrgToRoleMapping,
     updateOrg,
     UpdateOrgRequest,
@@ -288,6 +294,29 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return createOrgSamlConnectionLink(authUrl, integrationApiKey, orgId, expiresInSeconds)
     }
 
+    function fetchSamlSpMetadataWrapper(
+        orgId: string,
+    ): Promise<FetchSamlSpMetadataResponse> {
+        return fetchSamlSpMetadata(authUrl, integrationApiKey, orgId)
+    }
+
+    function setSamlIdpMetadataWrapper(
+        orgId: string,
+        samlIdpMetadata: SetSamlIdpMetadataRequest,
+    ): Promise<boolean> {
+        return setSamlIdpMetadata(authUrl, integrationApiKey, samlIdpMetadata)
+    }
+
+    function samlGoLiveWrapper(
+        orgId: string,
+    ): Promise<boolean> {
+        return samlGoLive(authUrl, integrationApiKey, orgId)
+    }
+
+    function deleteSamlConnectionWrapper(orgId: string): Promise<boolean> {
+        return deleteSamlConnection(authUrl, integrationApiKey, orgId)
+    }
+
     function inviteUserToOrgWrapper(inviteUserToOrgRequest: InviteUserToOrgRequest): Promise<boolean> {
         return inviteUserToOrg(authUrl, integrationApiKey, inviteUserToOrgRequest)
     }
@@ -390,6 +419,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         inviteUserToOrg: inviteUserToOrgWrapper,
         fetchPendingInvites: fetchPendingInvitesWrapper,
         revokePendingOrgInvite: revokePendingOrgInviteWrapper,
+        fetchSamlSpMetadata: fetchSamlSpMetadataWrapper,
+        setSamlIdpMetadata: setSamlIdpMetadataWrapper,
+        samlGoLive: samlGoLiveWrapper,
+        deleteSamlConnection: deleteSamlConnectionWrapper,
         // api keys functions
         fetchApiKey: fetchApiKeyWrapper,
         fetchCurrentApiKeys: fetchCurrentApiKeysWrapper,
