@@ -460,7 +460,6 @@ export async function createOrgSamlConnectionLink(
 }
 
 export type SetSamlIdpMetadataRequest = {
-    orgId: string
     idpEntityId: string
     idpSsoUrl: string
     idpCertificate: string
@@ -472,18 +471,27 @@ export type IdpProvider = "Google" | "Rippling" | "OneLogin" | "JumpCloud" | "Ok
 export function setSamlIdpMetadata(
     authUrl: URL,
     integrationApiKey: string,
+    orgId: string,
     setSamlIdpMetadataRequest: SetSamlIdpMetadataRequest
 ): Promise<boolean> {
-    if (!isValidId(setSamlIdpMetadataRequest.orgId)) {
+    if (!isValidId(orgId)) {
         return Promise.resolve(false)
     }
+
+    let request = {
+        org_id: orgId,
+        idp_entity_id: setSamlIdpMetadataRequest.idpEntityId,
+        idp_sso_url: setSamlIdpMetadataRequest.idpSsoUrl,
+        idp_certificate: setSamlIdpMetadataRequest.idpCertificate,
+        provider: setSamlIdpMetadataRequest.provider,
+    };
 
     return httpRequest(
         authUrl,
         integrationApiKey,
         `${BASE_ENDPOINT_PATH}/saml_idp_metadata`,
         "POST",
-        JSON.stringify(setSamlIdpMetadataRequest)
+        JSON.stringify(request)
     ).then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {

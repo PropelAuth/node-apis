@@ -304,7 +304,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         orgId: string,
         samlIdpMetadata: SetSamlIdpMetadataRequest,
     ): Promise<boolean> {
-        return setSamlIdpMetadata(authUrl, integrationApiKey, samlIdpMetadata)
+        return setSamlIdpMetadata(authUrl, integrationApiKey, orgId, samlIdpMetadata)
     }
 
     function samlGoLiveWrapper(
