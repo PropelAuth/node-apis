@@ -11,7 +11,8 @@ import { httpRequest } from "../http"
 import { CreatedOrg, Org, Organization } from "../user"
 import { isValidId, parseSnakeCaseToCamelCase } from "../utils"
 
-const ENDPOINT_PATH = "/api/backend/v1/org"
+const BASE_ENDPOINT_PATH = "/api/backend/v1"
+const ORG_ENDPOINT_PATH = BASE_ENDPOINT_PATH + "/org"
 
 // GET
 export function fetchOrg(authUrl: URL, integrationApiKey: string, orgId: string): Promise<Organization | null> {
@@ -19,7 +20,7 @@ export function fetchOrg(authUrl: URL, integrationApiKey: string, orgId: string)
         return Promise.resolve(null)
     }
 
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${orgId}`, "GET").then((httpResponse) => {
+    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/${orgId}`, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
         } else if (httpResponse.statusCode === 404) {
@@ -101,6 +102,33 @@ export function fetchPendingInvites(
                 "Cannot use organizations unless B2B support is enabled. Enable it in your PropelAuth dashboard."
             )
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when fetching pending invites")
+        }
+
+        return parseSnakeCaseToCamelCase(httpResponse.response)
+    })
+}
+
+export type FetchSamlSpMetadataResponse = {
+    entityId: string
+    acsUrl: string
+    logoutUrl: string
+}
+
+export function fetchSamlSpMetadata(
+    authUrl: URL,
+    integrationApiKey: string,
+    orgId: string
+): Promise<FetchSamlSpMetadataResponse> {
+    const path = BASE_ENDPOINT_PATH + `/saml_sp_metadata/${orgId}`
+    return httpRequest(authUrl, integrationApiKey, path, "GET").then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 426) {
+            throw new Error(
+                "Cannot use organizations unless B2B support is enabled. Enable it in your PropelAuth dashboard."
+            )
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
             throw new Error("Unknown error when fetching custom role mappings")
         }
 
@@ -135,7 +163,7 @@ export function fetchOrgByQuery(authUrl: URL, integrationApiKey: string, query: 
         legacy_org_id: query.legacyOrgId,
         domain: query.domain,
     }
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/query`, "POST", JSON.stringify(request)).then(
+    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/query`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
@@ -225,7 +253,7 @@ export function createOrg(
     if (customRoleMappingName) {
         request["custom_role_mapping_name"] = customRoleMappingName
     }
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/`, "POST", JSON.stringify(request)).then(
+    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
@@ -258,7 +286,7 @@ export function addUserToOrg(
         role: addUserToOrgRequest.role,
         additional_roles: addUserToOrgRequest.additionalRoles ?? [],
     }
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/add_user`, "POST", JSON.stringify(request)).then(
+    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/add_user`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
@@ -296,7 +324,7 @@ export function changeUserRoleInOrg(
     return httpRequest(
         authUrl,
         integrationApiKey,
-        `${ENDPOINT_PATH}/change_role`,
+        `${ORG_ENDPOINT_PATH}/change_role`,
         "POST",
         JSON.stringify(request)
     ).then((httpResponse) => {
@@ -331,7 +359,7 @@ export function removeUserFromOrg(
     return httpRequest(
         authUrl,
         integrationApiKey,
-        `${ENDPOINT_PATH}/remove_user`,
+        `${ORG_ENDPOINT_PATH}/remove_user`,
         "POST",
         JSON.stringify(request)
     ).then((httpResponse) => {
@@ -358,7 +386,7 @@ export function allowOrgToSetupSamlConnection(
         return Promise.resolve(false)
     }
 
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${orgId}/allow_saml`, "POST").then(
+    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/${orgId}/allow_saml`, "POST").then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
@@ -382,7 +410,7 @@ export function disallowOrgToSetupSamlConnection(
         return Promise.resolve(false)
     }
 
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${orgId}/disallow_saml`, "POST").then(
+    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/${orgId}/disallow_saml`, "POST").then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
@@ -418,7 +446,7 @@ export async function createOrgSamlConnectionLink(
     const response = await httpRequest(
         authUrl,
         integrationApiKey,
-        `${ENDPOINT_PATH}/${orgId}/create_saml_connection_link`,
+        `${ORG_ENDPOINT_PATH}/${orgId}/create_saml_connection_link`,
         "POST",
         JSON.stringify(request)
     )
@@ -431,6 +459,80 @@ export async function createOrgSamlConnectionLink(
     }
 
     return JSON.parse(response.response)
+}
+
+export type SetSamlIdpMetadataRequest = {
+    idpEntityId: string
+    idpSsoUrl: string
+    idpCertificate: string
+    provider: IdpProvider
+}
+
+export type IdpProvider = "Google" | "Rippling" | "OneLogin" | "JumpCloud" | "Okta" | "Azure" | "Duo" | "Generic";
+
+export function setSamlIdpMetadata(
+    authUrl: URL,
+    integrationApiKey: string,
+    orgId: string,
+    setSamlIdpMetadataRequest: SetSamlIdpMetadataRequest
+): Promise<boolean> {
+    if (!isValidId(orgId)) {
+        return Promise.resolve(false)
+    }
+
+    let request = {
+        org_id: orgId,
+        idp_entity_id: setSamlIdpMetadataRequest.idpEntityId,
+        idp_sso_url: setSamlIdpMetadataRequest.idpSsoUrl,
+        idp_certificate: setSamlIdpMetadataRequest.idpCertificate,
+        provider: setSamlIdpMetadataRequest.provider,
+    };
+
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${BASE_ENDPOINT_PATH}/saml_idp_metadata`,
+        "POST",
+        JSON.stringify(request)
+    ).then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 400) {
+                throw new UpdateOrgException(httpResponse.response)
+            } else if (httpResponse.statusCode === 404) {
+                return false
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when setting the SAML IdP metadata for an org's SAML connection")
+            }
+
+            return true
+        }
+    )
+}
+
+export function samlGoLive(
+    authUrl: URL,
+    integrationApiKey: string,
+    orgId: string
+): Promise<boolean> {
+    if (!isValidId(orgId)) {
+        return Promise.resolve(false)
+    }
+
+    return httpRequest(authUrl, integrationApiKey, `${BASE_ENDPOINT_PATH}/saml_idp_metadata/go_live/${orgId}`, "POST").then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 404) {
+                return false
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when setting orgs SAML connection to go live")
+            }
+
+            return true
+        }
+    )
 }
 
 // PUT/PATCH
@@ -469,7 +571,7 @@ export function updateOrg(
     return httpRequest(
         authUrl,
         integrationApiKey,
-        `${ENDPOINT_PATH}/${updateOrgRequest.orgId}`,
+        `${ORG_ENDPOINT_PATH}/${updateOrgRequest.orgId}`,
         "PUT",
         JSON.stringify(request)
     ).then((httpResponse) => {
@@ -500,7 +602,7 @@ export function subscribeOrgToRoleMapping(
     const request = {
         custom_role_mapping_name: customRoleMappingName,
     }
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${orgId}`, "PUT", JSON.stringify(request)).then(
+    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/${orgId}`, "PUT", JSON.stringify(request)).then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
@@ -523,7 +625,7 @@ export function deleteOrg(authUrl: URL, integrationApiKey: string, orgId: string
         return Promise.resolve(false)
     }
 
-    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${orgId}`, "DELETE").then((httpResponse) => {
+    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/${orgId}`, "DELETE").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
         } else if (httpResponse.statusCode === 404) {
@@ -565,6 +667,35 @@ export function revokePendingOrgInvite(
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
             throw new Error("Unknown error when revoking org invite")
+        }
+
+        return true
+    })
+}
+
+export function deleteSamlConnection(
+    authUrl: URL,
+    integrationApiKey: string,
+    orgId: string
+): Promise<boolean> {
+    if (!isValidId(orgId)) {
+        return Promise.resolve(false)
+    }
+
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${BASE_ENDPOINT_PATH}/saml_idp_metadata/${orgId}`,
+        "DELETE"
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 400) {
+            throw new RevokePendingOrgInviteException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when deleting SAML connection")
         }
 
         return true
