@@ -115,6 +115,7 @@ export type OrgQuery = {
     orderBy?: "CREATED_AT_ASC" | "CREATED_AT_DESC" | "NAME"
     name?: string
     legacyOrgId?: string
+    domain?: string
 }
 
 export type OrgQueryResponse = {
@@ -132,6 +133,7 @@ export function fetchOrgByQuery(authUrl: URL, integrationApiKey: string, query: 
         order_by: query.orderBy,
         name: query.name,
         legacy_org_id: query.legacyOrgId,
+        domain: query.domain,
     }
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/query`, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
