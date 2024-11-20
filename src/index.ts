@@ -13,6 +13,9 @@ export type {
     PendingInvitesPage,
     PendingInvite,
     RevokePendingOrgInviteRequest,
+    FetchSamlSpMetadataResponse,
+    SetSamlIdpMetadataRequest,
+    IdpProvider,
 } from "./api/org"
 export type { TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 export type {
