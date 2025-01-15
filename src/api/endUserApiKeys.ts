@@ -4,6 +4,7 @@ import {
     ApiKeyFetchException,
     ApiKeyUpdateException,
     ApiKeyValidateException,
+    ApiKeyValidateRateLimitedException,
 } from "../exceptions"
 import { httpRequest } from "../http"
 import { ApiKeyFull, ApiKeyNew, ApiKeyResultPage, ApiKeyValidation } from "../user"
@@ -144,6 +145,8 @@ export function validateApiKey(
                 throw new Error("integrationApiKey is incorrect")
             } else if (httpResponse.statusCode === 400) {
                 throw new ApiKeyValidateException(httpResponse.response)
+            } else if (httpResponse.statusCode === 429) {
+                throw new ApiKeyValidateRateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
                 throw new Error("Unknown error when updating the end user api key")
             }
