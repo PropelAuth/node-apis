@@ -33,6 +33,7 @@ export type { MigrateUserFromExternalSourceRequest } from "./api/migrateUser"
 export type { ApiKeysQueryRequest, ApiKeysCreateRequest, ApiKeyUpdateRequest } from "./api/endUserApiKeys"
 export {
     ApiKeyValidateException,
+    ApiKeyValidateRateLimitedException,
     ApiKeyDeleteException,
     ApiKeyUpdateException,
     ApiKeyCreateException,

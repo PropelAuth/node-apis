@@ -143,6 +143,19 @@ export class ApiKeyValidateException extends Error {
     }
 }
 
+export class ApiKeyValidateRateLimitedException extends Error {
+    readonly waitSeconds: number;
+    readonly userFacingError: string;
+    readonly errorCode: string;
+    constructor(errorBody: string) {
+        super(errorBody);
+        const parsedErrorBody = JSON.parse(errorBody);
+        this.waitSeconds = parsedErrorBody.wait_seconds;
+        this.userFacingError = parsedErrorBody.user_facing_error;
+        this.errorCode = parsedErrorBody.error_code;
+    }
+}
+
 export class ApiKeyDeleteException extends Error {
     readonly fieldToErrors: {[fieldName: string]: string[]};
     constructor(message: string) {
