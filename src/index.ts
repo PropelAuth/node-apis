@@ -25,6 +25,7 @@ export type {
     UpdateUserMetadataRequest,
     UpdateUserPasswordRequest,
     UsersInOrgQuery,
+    UsersInOrgPagedResponse,
     UsersPagedResponse,
     UsersQuery,
     UserSignupQueryParams,
