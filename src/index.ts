@@ -24,6 +24,7 @@ export type {
     UpdateUserEmailRequest,
     UpdateUserMetadataRequest,
     UpdateUserPasswordRequest,
+    UserInOrgMetadata,
     UsersInOrgQuery,
     UsersInOrgPagedResponse,
     UsersPagedResponse,
