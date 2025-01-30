@@ -77,6 +77,7 @@ import {
     UserSignupQueryParams,
     UsersInOrgQuery,
     UsersPagedResponse,
+    UsersInOrgPagedResponse,
     UsersQuery,
 } from "./api/user"
 import { CustomRoleMappings } from "./customRoleMappings"
@@ -175,7 +176,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return fetchUsersByQuery(authUrl, integrationApiKey, usersQuery)
     }
 
-    function fetchUsersInOrgWrapper(usersInOrgQuery: UsersInOrgQuery): Promise<UsersPagedResponse> {
+    function fetchUsersInOrgWrapper(usersInOrgQuery: UsersInOrgQuery): Promise<UsersInOrgPagedResponse> {
         return fetchUsersInOrg(authUrl, integrationApiKey, usersInOrgQuery)
     }
 

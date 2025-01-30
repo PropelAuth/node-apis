@@ -28,6 +28,19 @@ export type UsersPagedResponse = {
     hasMoreResults: boolean
 }
 
+export type UserInOrgMetadata = UserMetadata & {
+    roleInOrg: string
+    additionalRolesInOrg: string[]
+}
+
+export type UsersInOrgPagedResponse = {
+    users: UserInOrgMetadata[]
+    totalUsers: number
+    currentPage: number
+    pageSize: number
+    hasMoreResults: boolean
+}
+
 export type UsersInOrgQuery = {
     orgId: string
     pageSize?: number
@@ -103,9 +116,9 @@ export function fetchUsersInOrg(
     authUrl: URL,
     integrationApiKey: string,
     query: UsersInOrgQuery
-): Promise<UsersPagedResponse> {
+): Promise<UsersInOrgPagedResponse> {
     if (!isValidId(query.orgId)) {
-        const emptyResponse: UsersPagedResponse = {
+        const emptyResponse: UsersInOrgPagedResponse = {
             users: [],
             totalUsers: 0,
             currentPage: query.pageNumber || 0,
