@@ -1,4 +1,4 @@
-import { MigrateUserException } from "../exceptions"
+import { MigrateUserException, RateLimitedException } from "../exceptions"
 import { httpRequest } from "../http"
 import { CreatedUser } from "../user"
 import { parseSnakeCaseToCamelCase } from "../utils"
@@ -64,6 +64,8 @@ export function migrateUserFromExternalSource(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new MigrateUserException(httpResponse.response)
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {

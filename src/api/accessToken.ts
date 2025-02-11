@@ -1,4 +1,4 @@
-import { AccessTokenCreationException, UserNotFoundException } from "../exceptions"
+import { AccessTokenCreationException, RateLimitedException, UserNotFoundException } from "../exceptions"
 import { httpRequest } from "../http"
 import { isValidId } from "../utils"
 
@@ -31,6 +31,8 @@ export function createAccessToken(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new AccessTokenCreationException(httpResponse.response)
             } else if (httpResponse.statusCode === 403) {

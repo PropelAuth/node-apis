@@ -156,6 +156,12 @@ export class ApiKeyValidateRateLimitedException extends Error {
     }
 }
 
+export class RateLimitedException extends Error {
+    constructor(message: string) {
+        super(message);
+    }
+}
+
 export class ApiKeyDeleteException extends Error {
     readonly fieldToErrors: {[fieldName: string]: string[]};
     constructor(message: string) {

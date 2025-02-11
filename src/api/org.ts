@@ -3,6 +3,7 @@ import {
     AddUserToOrgException,
     ChangeUserRoleInOrgException,
     CreateOrgException,
+    RateLimitedException,
     RemoveUserFromOrgException,
     RevokePendingOrgInviteException,
     UpdateOrgException,
@@ -23,6 +24,8 @@ export function fetchOrg(authUrl: URL, integrationApiKey: string, orgId: string)
     return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/${orgId}`, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
             return null
         } else if (httpResponse.statusCode === 426) {
@@ -42,6 +45,8 @@ export function fetchCustomRoleMappings(authUrl: URL, integrationApiKey: string)
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 426) {
                 throw new Error(
                     "Cannot use organizations unless B2B support is enabled. Enable it in your PropelAuth dashboard."
@@ -97,6 +102,8 @@ export function fetchPendingInvites(
     return httpRequest(authUrl, integrationApiKey, path, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 426) {
             throw new Error(
                 "Cannot use organizations unless B2B support is enabled. Enable it in your PropelAuth dashboard."
@@ -124,6 +131,8 @@ export function fetchSamlSpMetadata(
     return httpRequest(authUrl, integrationApiKey, path, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 426) {
             throw new Error(
                 "Cannot use organizations unless B2B support is enabled. Enable it in your PropelAuth dashboard."
@@ -167,6 +176,8 @@ export function fetchOrgByQuery(authUrl: URL, integrationApiKey: string, query: 
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new Error("Invalid query " + httpResponse.response)
             } else if (httpResponse.statusCode === 426) {
@@ -257,6 +268,8 @@ export function createOrg(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new CreateOrgException(httpResponse.response)
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -290,6 +303,8 @@ export function addUserToOrg(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new AddUserToOrgException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
@@ -330,6 +345,8 @@ export function changeUserRoleInOrg(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new ChangeUserRoleInOrgException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
@@ -365,6 +382,8 @@ export function removeUserFromOrg(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new RemoveUserFromOrgException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
@@ -390,6 +409,8 @@ export function allowOrgToSetupSamlConnection(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return false
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -414,6 +435,8 @@ export function disallowOrgToSetupSamlConnection(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return false
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -452,6 +475,8 @@ export async function createOrgSamlConnectionLink(
     )
     if (response.statusCode === 401) {
         throw new Error("integrationApiKey is incorrect")
+    } else if (response.statusCode === 429) {
+        throw new RateLimitedException(response.response)
     } else if (response.statusCode === 404) {
         throw new Error("Org not found")
     } else if (response.statusCode && response.statusCode >= 400) {
@@ -498,6 +523,8 @@ export function setSamlIdpMetadata(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new UpdateOrgException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
@@ -524,6 +551,8 @@ export function samlGoLive(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return false
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -577,6 +606,8 @@ export function updateOrg(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new UpdateOrgException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
@@ -606,6 +637,8 @@ export function subscribeOrgToRoleMapping(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new UpdateOrgException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
@@ -628,6 +661,8 @@ export function deleteOrg(authUrl: URL, integrationApiKey: string, orgId: string
     return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/${orgId}`, "DELETE").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -661,6 +696,8 @@ export function revokePendingOrgInvite(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new RevokePendingOrgInviteException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
@@ -690,6 +727,8 @@ export function deleteSamlConnection(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new RevokePendingOrgInviteException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
