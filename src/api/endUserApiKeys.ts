@@ -155,10 +155,10 @@ export function validateApiKey(
             } else if (httpResponse.statusCode === 400) {
                 throw new ApiKeyValidateException(httpResponse.response)
             } else if (httpResponse.statusCode === 429) {
-                const rateLimitError = new ApiKeyValidateRateLimitedException(httpResponse.response);
-                // if specefic fields like "error_code" can't be parsed from the response,
-                // it means the this is a PropelAuth rate limit error
-                if (!rateLimitError.errorCode) {
+                let rateLimitError: ApiKeyValidateRateLimitedException;
+                try {
+                    rateLimitError = new ApiKeyValidateRateLimitedException(httpResponse.response);
+                } catch (SyntaxError) {
                     throw new RateLimitedException(httpResponse.response);
                 }
                 throw rateLimitError;

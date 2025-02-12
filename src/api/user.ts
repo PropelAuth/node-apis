@@ -329,9 +329,11 @@ export function resendEmailConfirmation(authUrl: URL, integrationApiKey: string,
         } else if (httpResponse.statusCode === 404) {
             return false
         } else if (httpResponse.statusCode === 429) {
-            const errorMessage = JSON.parse(httpResponse.response).user_facing_error;
-            if (!errorMessage) {
-                throw new RateLimitedException(httpResponse.response)
+            let errorMessage: string;
+            try {
+                errorMessage = JSON.parse(httpResponse.response).user_facing_error;
+            } catch (SyntaxError) {
+                errorMessage = httpResponse.response;
             }
             throw new RateLimitedException(errorMessage)
         } else if (httpResponse.statusCode === 400) {
