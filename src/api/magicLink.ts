@@ -1,4 +1,4 @@
-import { MagicLinkCreationException } from "../exceptions"
+import { MagicLinkCreationException, RateLimitedException } from "../exceptions"
 import { httpRequest } from "../http"
 
 const ENDPOINT_PATH = "/api/backend/v1/magic_link"
@@ -30,6 +30,8 @@ export function createMagicLink(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new MagicLinkCreationException(httpResponse.response)
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {

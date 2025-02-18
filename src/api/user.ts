@@ -1,6 +1,7 @@
 import {
     BadRequestException,
     CreateUserException,
+    RateLimitedException,
     UpdateUserEmailException,
     UpdateUserMetadataException,
     UpdateUserPasswordException,
@@ -61,6 +62,8 @@ export function fetchUserMetadataByQuery(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return null
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -102,6 +105,8 @@ export function fetchUsersByQuery(
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/query?${q}`, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new Error("Invalid query " + httpResponse.response)
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -139,6 +144,8 @@ export function fetchUsersInOrg(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new Error("Invalid query " + httpResponse.response)
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -170,6 +177,8 @@ export function fetchBatchUserMetadata(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new Error("Bad request " + httpResponse.response)
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -222,6 +231,8 @@ export function createUser(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new CreateUserException(httpResponse.response)
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -242,6 +253,8 @@ export function disableUser(authUrl: URL, integrationApiKey: string, userId: str
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return false
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -261,6 +274,8 @@ export function enableUser(authUrl: URL, integrationApiKey: string, userId: stri
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${userId}/enable`, "POST").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -280,6 +295,8 @@ export function disableUser2fa(authUrl: URL, integrationApiKey: string, userId: 
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return false
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -312,7 +329,13 @@ export function resendEmailConfirmation(authUrl: URL, integrationApiKey: string,
         } else if (httpResponse.statusCode === 404) {
             return false
         } else if (httpResponse.statusCode === 429) {
-            throw new Error("Rate limited when resending email confirmation")
+            let errorMessage: string;
+            try {
+                errorMessage = JSON.parse(httpResponse.response).user_facing_error;
+            } catch (SyntaxError) {
+                errorMessage = httpResponse.response;
+            }
+            throw new RateLimitedException(errorMessage)
         } else if (httpResponse.statusCode === 400) {
             throw new BadRequestException(httpResponse.response)
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -346,6 +369,8 @@ export function inviteUserToOrg(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new BadRequestException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
@@ -368,6 +393,8 @@ export function logoutAllUserSessions(authUrl: URL, integrationApiKey: string, u
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return false
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -412,6 +439,8 @@ export function updateUserMetadata(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new UpdateUserMetadataException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
@@ -453,6 +482,8 @@ export function updateUserEmail(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new UpdateUserEmailException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
@@ -493,6 +524,8 @@ export function updateUserPassword(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new UpdateUserPasswordException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
@@ -514,6 +547,8 @@ export function enableUserCanCreateOrgs(authUrl: URL, integrationApiKey: string,
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return false
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -534,6 +569,8 @@ export function disableUserCanCreateOrgs(authUrl: URL, integrationApiKey: string
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 404) {
                 return false
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -558,6 +595,8 @@ export async function clearUserPassword(authUrl: URL, integrationApiKey: string,
     )
     if (httpResponse.statusCode === 401) {
         throw new Error("integrationApiKey is incorrect")
+    } else if (httpResponse.statusCode === 429) {
+        throw new RateLimitedException(httpResponse.response)
     } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
         throw new Error("Unknown error when clearing password")
     }
@@ -573,6 +612,8 @@ export function deleteUser(authUrl: URL, integrationApiKey: string, userId: stri
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${userId}`, "DELETE").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -604,6 +645,8 @@ export async function fetchUserSignupQueryParams(
     )
     if (httpResponse.statusCode === 401) {
         throw new Error("integrationApiKey is incorrect")
+    } else if (httpResponse.statusCode === 429) {
+        throw new RateLimitedException(httpResponse.response)
     } else if (httpResponse.statusCode === 404) {
         return null
     } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {

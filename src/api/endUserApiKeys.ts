@@ -5,6 +5,7 @@ import {
     ApiKeyUpdateException,
     ApiKeyValidateException,
     ApiKeyValidateRateLimitedException,
+    RateLimitedException,
 } from "../exceptions"
 import { httpRequest } from "../http"
 import { ApiKeyFull, ApiKeyNew, ApiKeyResultPage, ApiKeyValidation } from "../user"
@@ -21,6 +22,8 @@ export function fetchApiKey(authUrl: URL, integrationApiKey: string, apiKeyId: s
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${apiKeyId}`, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new ApiKeyFetchException(httpResponse.response)
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -56,6 +59,8 @@ export function fetchCurrentApiKeys(
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}?${queryString}`, "GET").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new ApiKeyFetchException(httpResponse.response)
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -84,6 +89,8 @@ export function fetchArchivedApiKeys(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new ApiKeyFetchException(httpResponse.response)
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -119,6 +126,8 @@ export function createApiKey(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
             } else if (httpResponse.statusCode === 400) {
                 throw new ApiKeyCreateException(httpResponse.response)
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -146,7 +155,13 @@ export function validateApiKey(
             } else if (httpResponse.statusCode === 400) {
                 throw new ApiKeyValidateException(httpResponse.response)
             } else if (httpResponse.statusCode === 429) {
-                throw new ApiKeyValidateRateLimitedException(httpResponse.response)
+                let rateLimitError: ApiKeyValidateRateLimitedException;
+                try {
+                    rateLimitError = new ApiKeyValidateRateLimitedException(httpResponse.response);
+                } catch (SyntaxError) {
+                    throw new RateLimitedException(httpResponse.response);
+                }
+                throw rateLimitError;
             } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
                 throw new Error("Unknown error when updating the end user api key")
             }
@@ -186,6 +201,8 @@ export function updateApiKey(
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new ApiKeyUpdateException(httpResponse.response)
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
@@ -205,6 +222,8 @@ export function deleteApiKey(authUrl: URL, integrationApiKey: string, apiKeyId: 
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${apiKeyId}`, "DELETE").then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
             throw new ApiKeyDeleteException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {

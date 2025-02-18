@@ -43,6 +43,7 @@ export {
     AccessTokenCreationException,
     AddUserToOrgException,
     BadRequestException,
+    RateLimitedException,
     CreateOrgException,
     CreateUserException,
     ForbiddenException,
