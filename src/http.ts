@@ -6,7 +6,7 @@ export type HttpResponse = {
 }
 
 export function httpRequest(
-    authUrlOrigin: URL,
+    authUrl: URL,
     apiKey: string,
     path: string,
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
@@ -15,7 +15,7 @@ export function httpRequest(
     let headers: any = {
         Authorization: "Bearer " + apiKey,
         "Content-Type": "application/json",
-        "X-Propelauth-url": authUrlOrigin.hostname,
+        "X-Propelauth-url": authUrl.hostname,
     }
 
     return fetch(BACKEND_API_BASE_URL + path, {
