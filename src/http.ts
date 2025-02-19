@@ -1,3 +1,5 @@
+const BACKEND_API_BASE_URL = "https://propelauth-api.com";
+
 export type HttpResponse = {
     statusCode?: number
     response: string
@@ -13,9 +15,10 @@ export function httpRequest(
     let headers: any = {
         Authorization: "Bearer " + apiKey,
         "Content-Type": "application/json",
+        "X-Propelauth-url": authUrlOrigin.hostname,
     }
 
-    return fetch(authUrlOrigin.origin + path, {
+    return fetch(BACKEND_API_BASE_URL + path, {
         method,
         headers,
         body,
