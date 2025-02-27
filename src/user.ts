@@ -171,6 +171,7 @@ export type Organization = {
     maxUsers?: number
     metadata?: { [key: string]: any }
     domain?: string
+    extraDomains: string[]
     domainAutojoin: boolean
     domainRestrict: boolean
     customRoleMappingName?: string
