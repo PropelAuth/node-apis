@@ -202,6 +202,7 @@ export type CreateUserRequest = {
 
     password?: string
     askUserToUpdatePasswordOnLogin?: boolean
+    ignoreDomainRestrictions?: boolean
 
     username?: string
     firstName?: string
@@ -221,6 +222,7 @@ export function createUser(
 
         password: createUserRequest.password,
         ask_user_to_update_password_on_login: createUserRequest.askUserToUpdatePasswordOnLogin,
+        ignore_domain_restrictions: createUserRequest.ignoreDomainRestrictions,
 
         username: createUserRequest.username,
         first_name: createUserRequest.firstName,
@@ -329,11 +331,11 @@ export function resendEmailConfirmation(authUrl: URL, integrationApiKey: string,
         } else if (httpResponse.statusCode === 404) {
             return false
         } else if (httpResponse.statusCode === 429) {
-            let errorMessage: string;
+            let errorMessage: string
             try {
-                errorMessage = JSON.parse(httpResponse.response).user_facing_error;
+                errorMessage = JSON.parse(httpResponse.response).user_facing_error
             } catch (SyntaxError) {
-                errorMessage = httpResponse.response;
+                errorMessage = httpResponse.response
             }
             throw new RateLimitedException(errorMessage)
         } else if (httpResponse.statusCode === 400) {
