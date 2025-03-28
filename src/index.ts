@@ -31,7 +31,7 @@ export type {
     UsersQuery,
     UserSignupQueryParams,
 } from "./api/user"
-export type { MigrateUserFromExternalSourceRequest } from "./api/migrateUser"
+export type { MigrateUserFromExternalSourceRequest, MigrateUserPasswordRequest } from "./api/migrateUser"
 export type { ApiKeysQueryRequest, ApiKeysCreateRequest, ApiKeyUpdateRequest } from "./api/endUserApiKeys"
 export {
     ApiKeyValidateException,
@@ -49,6 +49,7 @@ export {
     ForbiddenException,
     MagicLinkCreationException,
     MigrateUserException,
+    MigrateUserPasswordException,
     UserNotFoundException,
     UnauthorizedException,
     UnexpectedException,

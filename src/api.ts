@@ -12,7 +12,7 @@ import {
     validateApiKey,
 } from "./api/endUserApiKeys"
 import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
-import { migrateUserFromExternalSource, MigrateUserFromExternalSourceRequest } from "./api/migrateUser"
+import { migrateUserFromExternalSource, MigrateUserFromExternalSourceRequest, migrateUserPassword, MigrateUserPasswordRequest } from "./api/migrateUser"
 import {
     addUserToOrg,
     AddUserToOrgRequest,
@@ -252,6 +252,12 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return migrateUserFromExternalSource(authUrl, integrationApiKey, migrateUserFromExternalSourceRequest)
     }
 
+    function migrateUserPasswordWrapper(
+        migrateUserPasswordRequest: MigrateUserPasswordRequest
+    ): Promise<boolean> {
+        return migrateUserPassword(authUrl, integrationApiKey, migrateUserPasswordRequest)
+    }
+
     function createOrgWrapper(createOrgRequest: CreateOrgRequest): Promise<CreatedOrg> {
         return createOrg(authUrl, integrationApiKey, createOrgRequest)
     }
@@ -398,6 +404,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         createMagicLink: createMagicLinkWrapper,
         createAccessToken: createAccessTokenWrapper,
         migrateUserFromExternalSource: migrateUserFromExternalSourceWrapper,
+        migrateUserPassword: migrateUserPasswordWrapper,
         deleteUser: deleteUserWrapper,
         disableUser: disableUserWrapper,
         enableUser: enableUserWrapper,
