@@ -7,6 +7,7 @@ const ENDPOINT_PATH = "/api/backend/v1/access_token"
 export type CreateAccessTokenRequest = {
     userId: string
     durationInMinutes: number
+    activeOrgId?: string
 }
 
 export type AccessToken = {
@@ -26,6 +27,7 @@ export function createAccessToken(
     const request = {
         user_id: createAccessTokenRequest.userId,
         duration_in_minutes: createAccessTokenRequest.durationInMinutes,
+        active_org_id: createAccessTokenRequest.activeOrgId,
     }
     return httpRequest(authUrl, integrationApiKey, ENDPOINT_PATH, "POST", JSON.stringify(request)).then(
         (httpResponse) => {
