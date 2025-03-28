@@ -417,6 +417,7 @@ export type UpdateUserMetadataRequest = {
     metadata?: { [key: string]: any }
     properties?: { [key: string]: any }
     updatePasswordRequired?: boolean
+    legacyUserId?: string
 }
 export function updateUserMetadata(
     authUrl: URL,
@@ -436,6 +437,7 @@ export function updateUserMetadata(
         metadata: updateUserMetadataRequest.metadata,
         properties: updateUserMetadataRequest.properties,
         update_password_required: updateUserMetadataRequest.updatePasswordRequired,
+        legacy_user_id: updateUserMetadataRequest.legacyUserId,
     }
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${userId}`, "PUT", JSON.stringify(request)).then(
         (httpResponse) => {
