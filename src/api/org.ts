@@ -575,7 +575,8 @@ export type UpdateOrgRequest = {
     membersMustHaveEmailDomainMatch?: boolean // In the backend, this is the `domain_restrict` argument.
     domain?: string
     legacyOrgId?: string
-    // TODO: Add `require_2fa_by` optional argument.
+    require2faBy?: string
+    extraDomains?: string[]
 }
 
 export function updateOrg(
@@ -596,6 +597,8 @@ export function updateOrg(
         restrict_to_domain: updateOrgRequest.membersMustHaveEmailDomainMatch,
         domain: updateOrgRequest.domain,
         legacy_org_id: updateOrgRequest.legacyOrgId,
+        require_2fa_by: updateOrgRequest.require2faBy,
+        extra_domains: updateOrgRequest.extraDomains,
     }
     return httpRequest(
         authUrl,
