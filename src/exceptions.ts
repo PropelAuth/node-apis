@@ -14,6 +14,14 @@ export class MigrateUserException extends Error {
     }
 }
 
+export class MigrateUserPasswordException extends Error {
+    readonly fieldToErrors: {[fieldName: string]: string[]};
+    constructor(message: string) {
+        super(message);
+        this.fieldToErrors = JSON.parse(message);
+    }
+}
+
 export class CreateOrgException extends Error {
     readonly fieldToErrors: {[fieldName: string]: string[]};
     constructor(message: string) {
