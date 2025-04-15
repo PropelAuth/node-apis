@@ -11,8 +11,20 @@ import {
     updateApiKey,
     validateApiKey,
 } from "./api/endUserApiKeys"
+import {
+    StepUpMfaTokenType,
+    StepUpMfaVerifyTotpResponse,
+    VerifyTotpChallengeRequest,
+    verifyTotpChallenge,
+} from "./api/mfa/verifyTotp"
+import { StepUpMfaVerifyGrantResponse, VerifyStepUpGrantRequest, verifyStepUpGrant } from "./api/mfa/verifyGrant"
 import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
-import { migrateUserFromExternalSource, MigrateUserFromExternalSourceRequest, migrateUserPassword, MigrateUserPasswordRequest } from "./api/migrateUser"
+import {
+    migrateUserFromExternalSource,
+    MigrateUserFromExternalSourceRequest,
+    migrateUserPassword,
+    MigrateUserPasswordRequest,
+} from "./api/migrateUser"
 import {
     addUserToOrg,
     AddUserToOrgRequest,
@@ -252,9 +264,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return migrateUserFromExternalSource(authUrl, integrationApiKey, migrateUserFromExternalSourceRequest)
     }
 
-    function migrateUserPasswordWrapper(
-        migrateUserPasswordRequest: MigrateUserPasswordRequest
-    ): Promise<boolean> {
+    function migrateUserPasswordWrapper(migrateUserPasswordRequest: MigrateUserPasswordRequest): Promise<boolean> {
         return migrateUserPassword(authUrl, integrationApiKey, migrateUserPasswordRequest)
     }
 
@@ -301,22 +311,15 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return createOrgSamlConnectionLink(authUrl, integrationApiKey, orgId, expiresInSeconds)
     }
 
-    function fetchSamlSpMetadataWrapper(
-        orgId: string,
-    ): Promise<FetchSamlSpMetadataResponse> {
+    function fetchSamlSpMetadataWrapper(orgId: string): Promise<FetchSamlSpMetadataResponse> {
         return fetchSamlSpMetadata(authUrl, integrationApiKey, orgId)
     }
 
-    function setSamlIdpMetadataWrapper(
-        orgId: string,
-        samlIdpMetadata: SetSamlIdpMetadataRequest,
-    ): Promise<boolean> {
+    function setSamlIdpMetadataWrapper(orgId: string, samlIdpMetadata: SetSamlIdpMetadataRequest): Promise<boolean> {
         return setSamlIdpMetadata(authUrl, integrationApiKey, orgId, samlIdpMetadata)
     }
 
-    function samlGoLiveWrapper(
-        orgId: string,
-    ): Promise<boolean> {
+    function samlGoLiveWrapper(orgId: string): Promise<boolean> {
         return samlGoLive(authUrl, integrationApiKey, orgId)
     }
 
@@ -377,6 +380,18 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
 
     function validateApiKeyWrapper(apiKeyToken: string): Promise<ApiKeyValidation> {
         return validateApiKey(authUrl, integrationApiKey, apiKeyToken)
+    }
+
+    function verifyTotpChallengeWrapper(
+        verifyTotpChallengeRequest: VerifyTotpChallengeRequest
+    ): Promise<StepUpMfaVerifyTotpResponse> {
+        return verifyTotpChallenge(authUrl, integrationApiKey, verifyTotpChallengeRequest)
+    }
+
+    function verifyStepUpGrantWrapper(
+        verifyStepUpGrantRequest: VerifyStepUpGrantRequest
+    ): Promise<StepUpMfaVerifyGrantResponse> {
+        return verifyStepUpGrant(authUrl, integrationApiKey, verifyStepUpGrantRequest)
     }
 
     return {
@@ -441,5 +456,8 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         validateApiKey: validateApiKeyWrapper,
         validatePersonalApiKey: validatePersonalApiKeyWrapper,
         validateOrgApiKey: validateOrgApiKeyWrapper,
+        // step-up mfa functions
+        verifyTotpChallenge: verifyTotpChallengeWrapper,
+        verifyStepUpGrant: verifyStepUpGrantWrapper,
     }
 }
