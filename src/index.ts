@@ -1,10 +1,6 @@
 export type { AccessToken, CreateAccessTokenRequest } from "./api/accessToken"
 export type { CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
-export type {
-    StepUpMfaGrantType as StepUpMfaTokenType,
-    VerifyTotpChallengeRequest,
-    StepUpMfaVerifyTotpResponse,
-} from "./api/mfa/verifyTotp"
+export type { StepUpMfaGrantType, VerifyTotpChallengeRequest, StepUpMfaVerifyTotpResponse } from "./api/mfa/verifyTotp"
 export type { VerifyStepUpGrantRequest, StepUpMfaVerifyGrantResponse } from "./api/mfa/verifyGrant"
 export type {
     OrgQuery,
