@@ -1,22 +1,11 @@
 export type { AccessToken, CreateAccessTokenRequest } from "./api/accessToken"
 export type { CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
 export type {
-    StepUpMfaTokenType,
+    StepUpMfaGrantType as StepUpMfaTokenType,
     VerifyTotpChallengeRequest,
     StepUpMfaVerifyTotpResponse,
-    StepUpMfaVerifyTotpSuccessResponse,
-    StepUpMfaVerifyTotpErrorResponse,
-    StepUpMfaVerifyTotpInvalidRequestErrorResponse,
-    StepUpMfaVerifyTotpStandardErrorResponse,
 } from "./api/mfa/verifyTotp"
-export type {
-    VerifyStepUpGrantRequest,
-    StepUpMfaVerifyGrantResponse,
-    StepUpMfaVerifyGrantSuccessResponse,
-    StepUpMfaVerifyGrantErrorResponse,
-    StepUpMfaVerifyGrantInvalidRequestErrorResponse,
-    StepUpMfaVerifyGrantStandardErrorResponse,
-} from "./api/mfa/verifyGrant"
+export type { VerifyStepUpGrantRequest, StepUpMfaVerifyGrantResponse } from "./api/mfa/verifyGrant"
 export type {
     OrgQuery,
     OrgQueryResponse,
@@ -76,6 +65,11 @@ export {
     RemoveUserFromOrgException,
     UpdateOrgException,
     UpdateUserPasswordException,
+    InvalidRequestFieldsException,
+    FeatureGatedException,
+    MfaNotEnabledException,
+    IncorrectMfaCodeException,
+    RevokePendingOrgInviteException,
 } from "./exceptions"
 export type { SocialLoginProvider, SamlLoginProvider, LoginMethod } from "./loginMethod"
 export type { CustomRoleMappings, CustomRoleMapping } from "./customRoleMappings"

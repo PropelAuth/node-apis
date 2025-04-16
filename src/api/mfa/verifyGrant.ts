@@ -1,4 +1,10 @@
-import { UnauthorizedException, UnexpectedException } from "../../exceptions"
+import {
+    BadRequestException,
+    FeatureGatedException,
+    RateLimitedException,
+    UnauthorizedException,
+    UnexpectedException,
+} from "../../exceptions"
 import { httpRequest } from "../../http"
 
 const STEP_UP_VERIFY_GRANT_ENDPOINT_PATH = "/api/backend/v1/mfa/step-up/verify-grant"
@@ -9,28 +15,9 @@ export type VerifyStepUpGrantRequest = {
     grant: string
 }
 
-export type StepUpMfaVerifyGrantSuccessResponse = {
-    success: true
+export type StepUpMfaVerifyGrantResponse = {
+    success: boolean
 }
-
-export type StepUpMfaVerifyGrantInvalidRequestErrorResponse = {
-    success: false
-    errorCode: "invalid_request_fields"
-    message: string
-    userFacingErrors?: { [field: string]: string }
-}
-
-export type StepUpMfaVerifyGrantStandardErrorResponse = {
-    success: false
-    errorCode: "grant_not_found" | "feature_gated" | "unexpected_error"
-    message: string
-}
-
-export type StepUpMfaVerifyGrantErrorResponse =
-    | StepUpMfaVerifyGrantInvalidRequestErrorResponse
-    | StepUpMfaVerifyGrantStandardErrorResponse
-
-export type StepUpMfaVerifyGrantResponse = StepUpMfaVerifyGrantSuccessResponse | StepUpMfaVerifyGrantErrorResponse
 
 // POST
 export function verifyStepUpGrant(
@@ -50,46 +37,38 @@ export function verifyStepUpGrant(
         "POST",
         JSON.stringify(request)
     ).then((httpResponse) => {
-        try {
-            // Success case
-            if (httpResponse.statusCode && httpResponse.statusCode < 400) {
-                return {
-                    success: true,
-                }
+        // Success case
+        if (httpResponse.statusCode && httpResponse.statusCode < 400) {
+            return {
+                success: true,
             }
+        }
 
-            const errorResponse = httpResponse.response ? JSON.parse(httpResponse.response) : {}
+        let errorResponse: any = {}
+        try {
+            errorResponse = httpResponse.response ? JSON.parse(httpResponse.response) : {}
+        } catch (e) {
+            console.error("Failed to parse error response", e)
+            errorResponse = {}
+        }
 
-            if (httpResponse.statusCode === 401 || errorResponse.error_code === "unauthorized") {
-                throw new UnauthorizedException("integrationApiKey is incorrect")
-            } else if (errorResponse.error_code === "invalid_request_fields") {
+        if (httpResponse.statusCode === 401 || errorResponse.error_code === "unauthorized") {
+            throw new UnauthorizedException("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
+        } else if (errorResponse.error_code === "invalid_request_fields") {
+            const fieldToErrors = errorResponse.field_to_errors || {}
+            if (fieldToErrors["grant"] == "grant_not_found") {
                 return {
                     success: false,
-                    errorCode: "invalid_request_fields",
-                    message: errorResponse.user_facing_error || "Invalid request fields",
-                    userFacingErrors: errorResponse.user_facing_errors,
-                }
-            } else if (errorResponse.error_code === "token_not_found") {
-                return {
-                    success: false,
-                    errorCode: "grant_not_found",
-                    message: errorResponse.user_facing_error || "The grant you provided was not found",
-                }
-            } else if (errorResponse.error_code === "feature_gated") {
-                return {
-                    success: false,
-                    errorCode: "feature_gated",
-                    message: errorResponse.user_facing_error || "Feature is not available on current plan",
                 }
             } else {
-                return {
-                    success: false,
-                    errorCode: "unexpected_error",
-                    message: errorResponse.user_facing_error || "Unexpected error occurred",
-                }
+                throw new BadRequestException(httpResponse.response)
             }
-        } catch (error) {
-            throw new UnexpectedException("Failed to parse response")
+        } else if (errorResponse.error_code === "feature_gated") {
+            throw new FeatureGatedException()
+        } else {
+            throw new UnexpectedException("Unknown error when verifying step up grant")
         }
     })
 }

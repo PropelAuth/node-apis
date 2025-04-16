@@ -12,10 +12,9 @@ import {
     validateApiKey,
 } from "./api/endUserApiKeys"
 import {
-    StepUpMfaTokenType,
     StepUpMfaVerifyTotpResponse,
     VerifyTotpChallengeRequest,
-    verifyTotpChallenge,
+    verifyStepUpTotpChallenge,
 } from "./api/mfa/verifyTotp"
 import { StepUpMfaVerifyGrantResponse, VerifyStepUpGrantRequest, verifyStepUpGrant } from "./api/mfa/verifyGrant"
 import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
@@ -382,10 +381,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return validateApiKey(authUrl, integrationApiKey, apiKeyToken)
     }
 
-    function verifyTotpChallengeWrapper(
+    function verifyStepUpTotpChallengeWrapper(
         verifyTotpChallengeRequest: VerifyTotpChallengeRequest
     ): Promise<StepUpMfaVerifyTotpResponse> {
-        return verifyTotpChallenge(authUrl, integrationApiKey, verifyTotpChallengeRequest)
+        return verifyStepUpTotpChallenge(authUrl, integrationApiKey, verifyTotpChallengeRequest)
     }
 
     function verifyStepUpGrantWrapper(
@@ -457,7 +456,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         validatePersonalApiKey: validatePersonalApiKeyWrapper,
         validateOrgApiKey: validateOrgApiKeyWrapper,
         // step-up mfa functions
-        verifyTotpChallenge: verifyTotpChallengeWrapper,
+        verifyStepUpTotpChallenge: verifyStepUpTotpChallengeWrapper,
         verifyStepUpGrant: verifyStepUpGrantWrapper,
     }
 }
