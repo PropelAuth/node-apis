@@ -57,7 +57,7 @@ export function verifyStepUpGrant(
         } else if (httpResponse.statusCode === 429) {
             throw new RateLimitedException(httpResponse.response)
         } else if (errorResponse.error_code === "invalid_request_fields") {
-            const fieldToErrors = errorResponse.field_to_errors || {}
+            const fieldToErrors = errorResponse.field_errors || {}
             if (fieldToErrors["grant"] == "grant_not_found") {
                 return {
                     success: false,
