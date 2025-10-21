@@ -235,3 +235,43 @@ export function deleteApiKey(authUrl: URL, integrationApiKey: string, apiKeyId: 
         return true
     })
 }
+
+export type ApiKeyUsageQueryRequest = {
+    date: string
+    orgId?: string
+    userId?: string
+    api_key_id?: string
+}
+
+export type ApiKeyUsageQueryResponse = {
+    count: number
+}
+
+// Fetch API Key Usage
+export function fetchApiKeyUsage(
+    authUrl: URL,
+    integrationApiKey: string,
+    apiKeyQuery: ApiKeyUsageQueryRequest
+): Promise<ApiKeyUsageQueryResponse> {
+    const request = {
+        org_id: apiKeyQuery.orgId,
+        user_id: apiKeyQuery.userId,
+        api_key_id: apiKeyQuery.api_key_id,
+        date: apiKeyQuery.date
+    }
+    const queryString = formatQueryParameters(request)
+
+    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/usage?${queryString}`, "GET").then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
+        } else if (httpResponse.statusCode === 400) {
+            throw new ApiKeyFetchException(httpResponse.response)
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when fetching the end user api key usage")
+        }
+
+        return parseSnakeCaseToCamelCase(httpResponse.response)
+    })
+}

@@ -3,9 +3,12 @@ import {
     ApiKeysCreateRequest,
     ApiKeysQueryRequest,
     ApiKeyUpdateRequest,
+    ApiKeyUsageQueryRequest,
+    ApiKeyUsageQueryResponse,
     createApiKey,
     deleteApiKey,
     fetchApiKey,
+    fetchApiKeyUsage,
     fetchArchivedApiKeys,
     fetchCurrentApiKeys,
     updateApiKey,
@@ -18,6 +21,7 @@ import {
 } from "./api/mfa/verifyTotp"
 import { StepUpMfaVerifyGrantResponse, VerifyStepUpGrantRequest, verifyStepUpGrant } from "./api/mfa/verifyGrant"
 import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
+import { fetchEmployeeById, Employee } from "./api/employee"
 import {
     migrateUserFromExternalSource,
     MigrateUserFromExternalSourceRequest,
@@ -257,6 +261,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return createAccessToken(authUrl, integrationApiKey, createAccessTokenRequest)
     }
 
+    function fetchEmployeeByIdWrapper(employeeId: string): Promise<Employee | null> {
+        return fetchEmployeeById(authUrl, integrationApiKey, employeeId)
+    }
+
     function migrateUserFromExternalSourceWrapper(
         migrateUserFromExternalSourceRequest: MigrateUserFromExternalSourceRequest
     ): Promise<CreatedUser> {
@@ -393,6 +401,12 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return verifyStepUpGrant(authUrl, integrationApiKey, verifyStepUpGrantRequest)
     }
 
+    function fetchApiKeyUsageWrapper(
+        apiKeyUsageQuery: ApiKeyUsageQueryRequest
+    ): Promise<ApiKeyUsageQueryResponse> {
+        return fetchApiKeyUsage(authUrl, integrationApiKey, apiKeyUsageQuery)
+    }
+
     return {
         // fetching functions
         fetchTokenVerificationMetadata: fetchTokenVerificationMetadataWrapper,
@@ -455,8 +469,11 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         validateApiKey: validateApiKeyWrapper,
         validatePersonalApiKey: validatePersonalApiKeyWrapper,
         validateOrgApiKey: validateOrgApiKeyWrapper,
+        fetchApiKeyUsage: fetchApiKeyUsageWrapper,
         // step-up mfa functions
         verifyStepUpTotpChallenge: verifyStepUpTotpChallengeWrapper,
         verifyStepUpGrant: verifyStepUpGrantWrapper,
+        // employee functions
+        fetchEmployeeById: fetchEmployeeByIdWrapper,
     }
 }
