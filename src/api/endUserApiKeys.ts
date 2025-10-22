@@ -250,6 +250,7 @@ export function validateImportedApiKey(
 export type ApiKeyUpdateRequest = {
     expiresAtSeconds?: number
     metadata?: string
+    setToNeverExpire?: boolean
 }
 
 export function updateApiKey(
@@ -265,6 +266,7 @@ export function updateApiKey(
     const request = {
         expires_at_seconds: apiKeyUpdate.expiresAtSeconds,
         metadata: apiKeyUpdate.metadata,
+        set_to_never_expire: apiKeyUpdate.setToNeverExpire,
     }
 
     return httpRequest(
