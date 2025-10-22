@@ -26,6 +26,7 @@ export type { TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 export type {
     CreateUserRequest,
     InviteUserToOrgRequest,
+    InviteUserToOrgByUserIdRequest,
     UpdateUserEmailRequest,
     UpdateUserMetadataRequest,
     UpdateUserPasswordRequest,

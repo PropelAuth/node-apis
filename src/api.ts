@@ -95,6 +95,8 @@ import {
     fetchUsersInOrg,
     inviteUserToOrg,
     InviteUserToOrgRequest,
+    inviteUserToOrgByUserId,
+    InviteUserToOrgByUserIdRequest,
     logoutAllUserSessions,
     resendEmailConfirmation,
     updateUserEmail,
@@ -357,6 +359,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return inviteUserToOrg(authUrl, integrationApiKey, inviteUserToOrgRequest)
     }
 
+    function inviteUserToOrgByUserIdWrapper(inviteUserToOrgByUserIdRequest: InviteUserToOrgByUserIdRequest): Promise<boolean> {
+        return inviteUserToOrgByUserId(authUrl, integrationApiKey, inviteUserToOrgByUserIdRequest)
+    }
+
     function logoutAllUserSessionsWrapper(userId: string): Promise<boolean> {
         return logoutAllUserSessions(authUrl, integrationApiKey, userId)
     }
@@ -503,6 +509,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         disallowOrgToSetupSamlConnection: disallowOrgToSetupSamlConnectionWrapper,
         createOrgSamlConnectionLink: createOrgSamlConnectionLinkWrapper,
         inviteUserToOrg: inviteUserToOrgWrapper,
+        inviteUserToOrgByUserId: inviteUserToOrgByUserIdWrapper,
         fetchPendingInvites: fetchPendingInvitesWrapper,
         revokePendingOrgInvite: revokePendingOrgInviteWrapper,
         fetchSamlSpMetadata: fetchSamlSpMetadataWrapper,
