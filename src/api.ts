@@ -13,12 +13,26 @@ import {
     fetchCurrentApiKeys,
     updateApiKey,
     validateApiKey,
+    importApiKey,
+    ApiKeysImportRequest,
+    ApiKeysImportResponse,
+    validateImportedApiKey
 } from "./api/endUserApiKeys"
 import {
     StepUpMfaVerifyTotpResponse,
     VerifyTotpChallengeRequest,
     verifyStepUpTotpChallenge,
 } from "./api/mfa/verifyTotp"
+import {
+    sendSmsMfaCode,
+    SendSmsMfaCodeRequestResponse,
+    SendSmsMfaCodeRequest
+} from "./api/mfa/sendSmsMfaCode"
+import {
+    verifySmsChallenge,
+    VerifySmsChallengeRequest,
+    VerifySmsChallengeResponse
+} from "./api/mfa/verifySmsChallenge"
 import { StepUpMfaVerifyGrantResponse, VerifyStepUpGrantRequest, verifyStepUpGrant } from "./api/mfa/verifyGrant"
 import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
 import { fetchEmployeeById, Employee } from "./api/employee"
@@ -94,6 +108,11 @@ import {
     UsersPagedResponse,
     UsersInOrgPagedResponse,
     UsersQuery,
+    fetchUserMfaMethods,
+    MfaPhoneType,
+    MfaPhones,
+    MfaTotpType,
+    FetchUserMfaMethodsResponse
 } from "./api/user"
 import { CustomRoleMappings } from "./customRoleMappings"
 import {
@@ -407,6 +426,36 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return fetchApiKeyUsage(authUrl, integrationApiKey, apiKeyUsageQuery)
     }
 
+    function importApiKeyWrapper(
+        apiKeysImportRequest: ApiKeysImportRequest
+    ): Promise<ApiKeysImportResponse> {
+        return importApiKey(authUrl, integrationApiKey, apiKeysImportRequest)
+    }
+
+    function validateImportedApiKeyWrapper(
+        apiKeyToken: string
+    ): Promise<ApiKeyValidation> {
+        return validateImportedApiKey(authUrl, integrationApiKey, apiKeyToken)
+    }
+
+    function fetchUserMfaMethodsWrapper(
+        userId: string
+    ): Promise<FetchUserMfaMethodsResponse | null> {
+        return fetchUserMfaMethods(authUrl, integrationApiKey, userId)
+    }
+
+    function sendSmsMfaCodeWrapper(
+        sendSmsMfaCodeRequest: SendSmsMfaCodeRequest
+    ): Promise<SendSmsMfaCodeRequestResponse> {
+        return sendSmsMfaCode(authUrl, integrationApiKey, sendSmsMfaCodeRequest)
+    }
+
+    function verifySmsChallengeWrapper(
+        verifySmsChallengeRequest: VerifySmsChallengeRequest
+    ): Promise<VerifySmsChallengeResponse> {
+        return verifySmsChallenge(authUrl, integrationApiKey, verifySmsChallengeRequest)
+    }
+
     return {
         // fetching functions
         fetchTokenVerificationMetadata: fetchTokenVerificationMetadataWrapper,
@@ -441,6 +490,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         enableUserCanCreateOrgs: enableUserCanCreateOrgsWrapper,
         disableUserCanCreateOrgs: disableUserCanCreateOrgsWrapper,
         logoutAllUserSessions: logoutAllUserSessionsWrapper,
+        fetchUserMfaMethods: fetchUserMfaMethodsWrapper,
         // org management functions
         createOrg: createOrgWrapper,
         addUserToOrg: addUserToOrgWrapper,
@@ -470,9 +520,13 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         validatePersonalApiKey: validatePersonalApiKeyWrapper,
         validateOrgApiKey: validateOrgApiKeyWrapper,
         fetchApiKeyUsage: fetchApiKeyUsageWrapper,
+        importApiKey: importApiKeyWrapper,
+        validateImportedApiKey: validateImportedApiKeyWrapper,
         // step-up mfa functions
         verifyStepUpTotpChallenge: verifyStepUpTotpChallengeWrapper,
         verifyStepUpGrant: verifyStepUpGrantWrapper,
+        sendSmsMfaCode: sendSmsMfaCodeWrapper,
+        verifySmsChallenge: verifySmsChallengeWrapper,
         // employee functions
         fetchEmployeeById: fetchEmployeeByIdWrapper,
     }

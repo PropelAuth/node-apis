@@ -193,6 +193,14 @@ export class ApiKeyCreateException extends Error {
     }
 }
 
+export class ApiKeyImportException extends Error {
+    readonly fieldToErrors: { [fieldName: string]: string[] }
+    constructor(message: string) {
+        super(message)
+        this.fieldToErrors = JSON.parse(message)
+    }
+}
+
 export class ApiKeyFetchException extends Error {
     readonly fieldToErrors: { [fieldName: string]: string[] }
     constructor(message: string) {
