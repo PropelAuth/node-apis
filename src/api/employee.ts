@@ -1,4 +1,4 @@
-import { AccessTokenCreationException, RateLimitedException, UserNotFoundException } from "../exceptions"
+import { RateLimitedException, UserNotFoundException } from "../exceptions"
 import { httpRequest } from "../http"
 import { isValidId, parseSnakeCaseToCamelCase } from "../utils"
 
@@ -10,7 +10,7 @@ export type Employee = {
 
 export function fetchEmployeeById(authUrl: URL, integrationApiKey: string, employeeId: string): Promise<Employee | null> {
     if (!isValidId(employeeId)) {
-        return Promise.resolve(null)
+        throw new UserNotFoundException()
     }
 
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/${employeeId}`, "GET").then((httpResponse) => {

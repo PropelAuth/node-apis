@@ -33,7 +33,7 @@ export function sendSmsMfaCode(
         action_type: sendSmsMfaCodeRequest.actionType,
         user_id: sendSmsMfaCodeRequest.userId,
         mfa_phone_id: sendSmsMfaCodeRequest.mfaPhoneId,
-        grant: sendSmsMfaCodeRequest.grantType,
+        grant_type: sendSmsMfaCodeRequest.grantType,
         valid_for_seconds: sendSmsMfaCodeRequest.validForSeconds,
     }
     
