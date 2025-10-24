@@ -43,7 +43,7 @@ export type {
     FetchUserMfaMethodsResponse,
 } from "./api/user"
 export type { MigrateUserFromExternalSourceRequest, MigrateUserPasswordRequest } from "./api/migrateUser"
-export type { ApiKeysQueryRequest, ApiKeysCreateRequest, ApiKeyUpdateRequest, ApiKeyUsageQueryRequest, ApiKeysImportRequest } from "./api/endUserApiKeys"
+export type { ApiKeysQueryRequest, ApiKeysCreateRequest, ApiKeyUpdateRequest, ApiKeyUsageQueryRequest, ApiKeysImportRequest, ApiKeyUsageQueryResponse, ApiKeysImportResponse } from "./api/endUserApiKeys"
 export {
     ApiKeyValidateException,
     ApiKeyValidateRateLimitedException,
