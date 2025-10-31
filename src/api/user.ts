@@ -157,6 +157,52 @@ export function fetchUsersInOrg(
     )
 }
 
+export type MfaTotpType = {
+    type: string
+}
+
+export type MfaPhoneType = {
+    type: string
+    phone_numbers: MfaPhones[]
+}
+
+export type MfaPhones = {
+    mfa_phone_number_suffix: string
+    mfa_phone_id: string
+}
+
+export type FetchUserMfaMethodsResponse = {
+    mfaSetup: MfaTotpType | MfaPhoneType | null
+}
+
+export async function fetchUserMfaMethods(
+    authUrl: URL,
+    integrationApiKey: string,
+    userId: string
+): Promise<FetchUserMfaMethodsResponse | null> {
+    if (!isValidId(userId)) {
+        return Promise.resolve(null)
+    }
+
+    const httpResponse = await httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${ENDPOINT_PATH}/${userId}/mfa`,
+        "GET"
+    )
+    if (httpResponse.statusCode === 401) {
+        throw new Error("integrationApiKey is incorrect")
+    } else if (httpResponse.statusCode === 429) {
+        throw new RateLimitedException(httpResponse.response)
+    } else if (httpResponse.statusCode === 404) {
+        return null
+    } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+        throw new Error("Unknown error when fetching user mfa methods")
+    }
+
+    return parseSnakeCaseToCamelCase(httpResponse.response)
+}
+
 // POST
 export function fetchBatchUserMetadata(
     authUrl: URL,
@@ -368,6 +414,44 @@ export function inviteUserToOrg(
     }
 
     return httpRequest(authUrl, integrationApiKey, `/api/backend/v1/invite_user`, "POST", JSON.stringify(body)).then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
+            } else if (httpResponse.statusCode === 400) {
+                throw new BadRequestException(httpResponse.response)
+            } else if (httpResponse.statusCode === 404) {
+                return false
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when inviting a user to the org")
+            }
+
+            return true
+        }
+    )
+}
+
+export type InviteUserToOrgByUserIdRequest = {
+    orgId: string
+    userId: string
+    role: string
+    additionalRoles?: string[]
+}
+
+export function inviteUserToOrgByUserId(
+    authUrl: URL,
+    integrationApiKey: string,
+    inviteUserToOrgRequest: InviteUserToOrgByUserIdRequest
+): Promise<boolean> {
+    const body = {
+        org_id: inviteUserToOrgRequest.orgId,
+        user_id: inviteUserToOrgRequest.userId,
+        role: inviteUserToOrgRequest.role,
+        additional_roles: inviteUserToOrgRequest.additionalRoles ?? [],
+    }
+
+    return httpRequest(authUrl, integrationApiKey, `/api/backend/v1/invite_user_by_id`, "POST", JSON.stringify(body)).then(
         (httpResponse) => {
             if (httpResponse.statusCode === 401) {
                 throw new Error("integrationApiKey is incorrect")

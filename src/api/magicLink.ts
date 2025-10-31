@@ -8,6 +8,7 @@ export type CreateMagicLinkRequest = {
     redirectToUrl?: string
     expiresInHours?: number
     createNewUserIfOneDoesntExist?: boolean
+    expiresAfterFirstUse?: boolean
 }
 
 export type MagicLink = {
@@ -25,6 +26,7 @@ export function createMagicLink(
         redirect_to_url: createMagicLinkRequest.redirectToUrl,
         expires_in_hours: createMagicLinkRequest.expiresInHours,
         create_new_user_if_one_doesnt_exist: createMagicLinkRequest.createNewUserIfOneDoesntExist,
+        expire_after_first_use: createMagicLinkRequest.expiresAfterFirstUse,
     }
     return httpRequest(authUrl, integrationApiKey, ENDPOINT_PATH, "POST", JSON.stringify(request)).then(
         (httpResponse) => {

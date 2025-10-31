@@ -6,6 +6,7 @@ import {
     ApiKeyValidateException,
     ApiKeyValidateRateLimitedException,
     RateLimitedException,
+    ApiKeyImportException
 } from "../exceptions"
 import { httpRequest } from "../http"
 import { ApiKeyFull, ApiKeyNew, ApiKeyResultPage, ApiKeyValidation } from "../user"
@@ -171,10 +172,85 @@ export function validateApiKey(
     )
 }
 
+export type ApiKeysImportRequest = {
+    importedApiKey: string
+    orgId?: string
+    userId?: string
+    expiresAtSeconds?: number
+    metadata?: object
+}
+
+export type ApiKeysImportResponse = {
+    api_key_id: string
+}
+
+export function importApiKey(
+    authUrl: URL,
+    integrationApiKey: string,
+    apiKeyImport: ApiKeysImportRequest
+): Promise<ApiKeysImportResponse> {
+    const request = {
+        imported_api_key: apiKeyImport.importedApiKey,
+        org_id: apiKeyImport.orgId,
+        user_id: apiKeyImport.userId,
+        expires_at_seconds: apiKeyImport.expiresAtSeconds,
+        metadata: apiKeyImport.metadata,
+    }
+
+    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/import`, "POST", JSON.stringify(request)).then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
+            } else if (httpResponse.statusCode === 400) {
+                throw new ApiKeyImportException(httpResponse.response)
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when importing the end user api key")
+            }
+
+            return parseSnakeCaseToCamelCase(httpResponse.response)
+        }
+    )
+}
+
+export function validateImportedApiKey(
+    authUrl: URL,
+    integrationApiKey: string,
+    apiKeyToken: string
+): Promise<ApiKeyValidation> {
+    const request = {
+        api_key_token: removeBearerIfExists(apiKeyToken),
+    }
+
+    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/validate_imported`, "POST", JSON.stringify(request)).then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 400) {
+                throw new ApiKeyValidateException(httpResponse.response)
+            } else if (httpResponse.statusCode === 429) {
+                let rateLimitError: ApiKeyValidateRateLimitedException;
+                try {
+                    rateLimitError = new ApiKeyValidateRateLimitedException(httpResponse.response);
+                } catch (SyntaxError) {
+                    throw new RateLimitedException(httpResponse.response);
+                }
+                throw rateLimitError;
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when validating the imported end user api key")
+            }
+
+            return parseSnakeCaseToCamelCase(httpResponse.response)
+        }
+    )
+}
+
 // PUT/PATCH
 export type ApiKeyUpdateRequest = {
     expiresAtSeconds?: number
     metadata?: string
+    setToNeverExpire?: boolean
 }
 
 export function updateApiKey(
@@ -190,6 +266,7 @@ export function updateApiKey(
     const request = {
         expires_at_seconds: apiKeyUpdate.expiresAtSeconds,
         metadata: apiKeyUpdate.metadata,
+        set_to_never_expire: apiKeyUpdate.setToNeverExpire,
     }
 
     return httpRequest(
@@ -233,5 +310,45 @@ export function deleteApiKey(authUrl: URL, integrationApiKey: string, apiKeyId: 
         }
 
         return true
+    })
+}
+
+export type ApiKeyUsageQueryRequest = {
+    date: string
+    orgId?: string
+    userId?: string
+    api_key_id?: string
+}
+
+export type ApiKeyUsageQueryResponse = {
+    count: number
+}
+
+// Fetch API Key Usage
+export function fetchApiKeyUsage(
+    authUrl: URL,
+    integrationApiKey: string,
+    apiKeyQuery: ApiKeyUsageQueryRequest
+): Promise<ApiKeyUsageQueryResponse> {
+    const request = {
+        org_id: apiKeyQuery.orgId,
+        user_id: apiKeyQuery.userId,
+        api_key_id: apiKeyQuery.api_key_id,
+        date: apiKeyQuery.date
+    }
+    const queryString = formatQueryParameters(request)
+
+    return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/usage?${queryString}`, "GET").then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
+        } else if (httpResponse.statusCode === 400) {
+            throw new ApiKeyFetchException(httpResponse.response)
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when fetching the end user api key usage")
+        }
+
+        return parseSnakeCaseToCamelCase(httpResponse.response)
     })
 }

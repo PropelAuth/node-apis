@@ -1,7 +1,11 @@
 export type { AccessToken, CreateAccessTokenRequest } from "./api/accessToken"
+export type { Employee } from "./api/employee"
 export type { CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
-export type { StepUpMfaGrantType, VerifyTotpChallengeRequest, StepUpMfaVerifyTotpResponse } from "./api/mfa/verifyTotp"
+export type { VerifyTotpChallengeRequest, StepUpMfaVerifyTotpResponse } from "./api/mfa/verifyTotp"
+export { StepUpMfaGrantType } from "./api/mfa/verifyTotp"
 export type { VerifyStepUpGrantRequest, StepUpMfaVerifyGrantResponse } from "./api/mfa/verifyGrant"
+export type { SendSmsMfaCodeRequest, SendSmsMfaCodeRequestResponse } from "./api/mfa/sendSmsMfaCode"
+export type { VerifySmsChallengeRequest, VerifySmsChallengeResponse } from "./api/mfa/verifySmsChallenge"
 export type {
     OrgQuery,
     OrgQueryResponse,
@@ -23,6 +27,7 @@ export type { TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 export type {
     CreateUserRequest,
     InviteUserToOrgRequest,
+    InviteUserToOrgByUserIdRequest,
     UpdateUserEmailRequest,
     UpdateUserMetadataRequest,
     UpdateUserPasswordRequest,
@@ -32,9 +37,13 @@ export type {
     UsersPagedResponse,
     UsersQuery,
     UserSignupQueryParams,
+    MfaPhoneType,
+    MfaPhones,
+    MfaTotpType,
+    FetchUserMfaMethodsResponse,
 } from "./api/user"
 export type { MigrateUserFromExternalSourceRequest, MigrateUserPasswordRequest } from "./api/migrateUser"
-export type { ApiKeysQueryRequest, ApiKeysCreateRequest, ApiKeyUpdateRequest } from "./api/endUserApiKeys"
+export type { ApiKeysQueryRequest, ApiKeysCreateRequest, ApiKeyUpdateRequest, ApiKeyUsageQueryRequest, ApiKeysImportRequest, ApiKeyUsageQueryResponse, ApiKeysImportResponse } from "./api/endUserApiKeys"
 export {
     ApiKeyValidateException,
     ApiKeyValidateRateLimitedException,
@@ -42,6 +51,7 @@ export {
     ApiKeyUpdateException,
     ApiKeyCreateException,
     ApiKeyFetchException,
+    ApiKeyImportException,
     AccessTokenCreationException,
     AddUserToOrgException,
     BadRequestException,
