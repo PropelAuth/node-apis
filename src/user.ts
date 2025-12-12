@@ -159,6 +159,7 @@ export type Org = {
     legacyOrgId?: string
     metadata: { [key: string]: any }
     customRoleMappingName?: string
+    isolated: boolean
 }
 
 export type Organization = {
@@ -176,6 +177,7 @@ export type Organization = {
     domainRestrict: boolean
     customRoleMappingName?: string
     legacyOrgId?: string
+    isolated: boolean
 }
 
 export type CreatedOrg = {

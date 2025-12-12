@@ -46,6 +46,14 @@ export class ChangeUserRoleInOrgException extends Error {
     }
 }
 
+export class MigrateOrgToIsolatedException extends Error {
+    readonly fieldToErrors: { [fieldName: string]: string[] }
+    constructor(message: string) {
+        super(message)
+        this.fieldToErrors = JSON.parse(message)
+    }
+}
+
 export class RemoveUserFromOrgException extends Error {
     readonly fieldToErrors: { [fieldName: string]: string[] }
     constructor(message: string) {

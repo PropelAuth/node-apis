@@ -19,6 +19,7 @@ export type UsersQuery = {
     emailOrUsername?: string
     includeOrgs?: boolean
     legacyUserId?: string
+    isolatedOrgId?: string
 }
 
 export type UsersPagedResponse = {
@@ -100,6 +101,7 @@ export function fetchUsersByQuery(
         email_or_username: query.emailOrUsername,
         include_orgs: query.includeOrgs,
         legacy_user_id: query.legacyUserId,
+        isolated_org_id: query.isolatedOrgId
     }
     const q = formatQueryParameters(queryParams)
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/query?${q}`, "GET").then((httpResponse) => {
