@@ -217,6 +217,7 @@ export type UserMetadata = {
     impersonatorUserId?: string
     metadata?: { [key: string]: any }
     properties?: { [key: string]: unknown }
+    isolatedOrgId?: string
 }
 
 export class OrgMemberInfo {
