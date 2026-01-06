@@ -16,23 +16,15 @@ import {
     importApiKey,
     ApiKeysImportRequest,
     ApiKeysImportResponse,
-    validateImportedApiKey
+    validateImportedApiKey,
 } from "./api/endUserApiKeys"
 import {
     StepUpMfaVerifyTotpResponse,
     VerifyTotpChallengeRequest,
     verifyStepUpTotpChallenge,
 } from "./api/mfa/verifyTotp"
-import {
-    sendSmsMfaCode,
-    SendSmsMfaCodeRequestResponse,
-    SendSmsMfaCodeRequest
-} from "./api/mfa/sendSmsMfaCode"
-import {
-    verifySmsChallenge,
-    VerifySmsChallengeRequest,
-    VerifySmsChallengeResponse
-} from "./api/mfa/verifySmsChallenge"
+import { sendSmsMfaCode, SendSmsMfaCodeRequestResponse, SendSmsMfaCodeRequest } from "./api/mfa/sendSmsMfaCode"
+import { verifySmsChallenge, VerifySmsChallengeRequest, VerifySmsChallengeResponse } from "./api/mfa/verifySmsChallenge"
 import { StepUpMfaVerifyGrantResponse, VerifyStepUpGrantRequest, verifyStepUpGrant } from "./api/mfa/verifyGrant"
 import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
 import { fetchEmployeeById, Employee } from "./api/employee"
@@ -62,6 +54,7 @@ import {
     FetchPendingInvitesParams,
     fetchSamlSpMetadata,
     FetchSamlSpMetadataResponse,
+    migrateOrgToIsolated,
     OrgQuery,
     OrgQueryResponse,
     PendingInvitesPage,
@@ -114,7 +107,7 @@ import {
     MfaPhoneType,
     MfaPhones,
     MfaTotpType,
-    FetchUserMfaMethodsResponse
+    FetchUserMfaMethodsResponse,
 } from "./api/user"
 import { CustomRoleMappings } from "./customRoleMappings"
 import {
@@ -140,18 +133,36 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return fetchUserMetadataByUserIdWithIdCheck(authUrl, integrationApiKey, userId, includeOrgs)
     }
 
-    function fetchUserMetadataByEmail(email: string, includeOrgs?: boolean): Promise<UserMetadata | null> {
-        return fetchUserMetadataByQuery(authUrl, integrationApiKey, "email", {
+    function fetchUserMetadataByEmail(
+        email: string,
+        includeOrgs?: boolean,
+        isolatedOrgId?: string
+    ): Promise<UserMetadata | null> {
+        const params: any = {
             email: email,
             include_orgs: includeOrgs || false,
-        })
+        }
+
+        if (isolatedOrgId) {
+            params.isolated_org_id = isolatedOrgId
+        }
+        return fetchUserMetadataByQuery(authUrl, integrationApiKey, "email", params)
     }
 
-    function fetchUserMetadataByUsername(username: string, includeOrgs?: boolean): Promise<UserMetadata | null> {
-        return fetchUserMetadataByQuery(authUrl, integrationApiKey, "username", {
+    function fetchUserMetadataByUsername(
+        username: string,
+        includeOrgs?: boolean,
+        isolatedOrgId?: string
+    ): Promise<UserMetadata | null> {
+        const params: any = {
             username: username,
             include_orgs: includeOrgs || false,
-        })
+        }
+
+        if (isolatedOrgId) {
+            params.isolated_org_id = isolatedOrgId
+        }
+        return fetchUserMetadataByQuery(authUrl, integrationApiKey, "username", params)
     }
 
     function fetchBatchUserMetadataByUserIds(
@@ -359,7 +370,9 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return inviteUserToOrg(authUrl, integrationApiKey, inviteUserToOrgRequest)
     }
 
-    function inviteUserToOrgByUserIdWrapper(inviteUserToOrgByUserIdRequest: InviteUserToOrgByUserIdRequest): Promise<boolean> {
+    function inviteUserToOrgByUserIdWrapper(
+        inviteUserToOrgByUserIdRequest: InviteUserToOrgByUserIdRequest
+    ): Promise<boolean> {
         return inviteUserToOrgByUserId(authUrl, integrationApiKey, inviteUserToOrgByUserIdRequest)
     }
 
@@ -375,6 +388,12 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         revokePendingOrgInviteRequest: RevokePendingOrgInviteRequest
     ): Promise<boolean> {
         return revokePendingOrgInvite(authUrl, integrationApiKey, revokePendingOrgInviteRequest)
+    }
+
+    function migrateOrgToIsolatedWrapper(
+        orgId: string
+    ): Promise<boolean> {
+        return migrateOrgToIsolated(authUrl, integrationApiKey, orgId)
     }
 
     // end user api key wrappers
@@ -426,27 +445,19 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return verifyStepUpGrant(authUrl, integrationApiKey, verifyStepUpGrantRequest)
     }
 
-    function fetchApiKeyUsageWrapper(
-        apiKeyUsageQuery: ApiKeyUsageQueryRequest
-    ): Promise<ApiKeyUsageQueryResponse> {
+    function fetchApiKeyUsageWrapper(apiKeyUsageQuery: ApiKeyUsageQueryRequest): Promise<ApiKeyUsageQueryResponse> {
         return fetchApiKeyUsage(authUrl, integrationApiKey, apiKeyUsageQuery)
     }
 
-    function importApiKeyWrapper(
-        apiKeysImportRequest: ApiKeysImportRequest
-    ): Promise<ApiKeysImportResponse> {
+    function importApiKeyWrapper(apiKeysImportRequest: ApiKeysImportRequest): Promise<ApiKeysImportResponse> {
         return importApiKey(authUrl, integrationApiKey, apiKeysImportRequest)
     }
 
-    function validateImportedApiKeyWrapper(
-        apiKeyToken: string
-    ): Promise<ApiKeyValidation> {
+    function validateImportedApiKeyWrapper(apiKeyToken: string): Promise<ApiKeyValidation> {
         return validateImportedApiKey(authUrl, integrationApiKey, apiKeyToken)
     }
 
-    function fetchUserMfaMethodsWrapper(
-        userId: string
-    ): Promise<FetchUserMfaMethodsResponse | null> {
+    function fetchUserMfaMethodsWrapper(userId: string): Promise<FetchUserMfaMethodsResponse | null> {
         return fetchUserMfaMethods(authUrl, integrationApiKey, userId)
     }
 
@@ -516,6 +527,8 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         setSamlIdpMetadata: setSamlIdpMetadataWrapper,
         samlGoLive: samlGoLiveWrapper,
         deleteSamlConnection: deleteSamlConnectionWrapper,
+        migrateOrgToIsolated: migrateOrgToIsolatedWrapper,
+
         // api keys functions
         fetchApiKey: fetchApiKeyWrapper,
         fetchCurrentApiKeys: fetchCurrentApiKeysWrapper,

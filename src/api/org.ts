@@ -7,6 +7,7 @@ import {
     RemoveUserFromOrgException,
     RevokePendingOrgInviteException,
     UpdateOrgException,
+    MigrateOrgToIsolatedException
 } from "../exceptions"
 import { httpRequest } from "../http"
 import { CreatedOrg, Org, Organization } from "../user"
@@ -577,6 +578,7 @@ export type UpdateOrgRequest = {
     legacyOrgId?: string
     require2faBy?: string
     extraDomains?: string[]
+    ssoTrustLevel?: "AlwaysTrust" | "NeverTrust" | "TrustForDomain"
 }
 
 export function updateOrg(
@@ -599,6 +601,7 @@ export function updateOrg(
         legacy_org_id: updateOrgRequest.legacyOrgId,
         require_2fa_by: updateOrgRequest.require2faBy,
         extra_domains: updateOrgRequest.extraDomains,
+        sso_trust_level: updateOrgRequest.ssoTrustLevel
     }
     return httpRequest(
         authUrl,
@@ -738,6 +741,37 @@ export function deleteSamlConnection(
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
             throw new Error("Unknown error when deleting SAML connection")
+        }
+
+        return true
+    })
+}
+
+export function migrateOrgToIsolated(
+    authUrl: URL,
+    integrationApiKey: string,
+    orgId: string
+): Promise<boolean> {
+    const request = {
+        org_id: orgId,
+    }
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${BASE_ENDPOINT_PATH}/isolate_org`,
+        "POST",
+        JSON.stringify(request)
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
+        } else if (httpResponse.statusCode === 400) {
+            throw new MigrateOrgToIsolatedException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when migrating org to isolated")
         }
 
         return true

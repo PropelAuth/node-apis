@@ -76,6 +76,7 @@ export {
     MfaNotEnabledException,
     IncorrectMfaCodeException,
     RevokePendingOrgInviteException,
+    MigrateOrgToIsolatedException
 } from "./exceptions"
 export type { SocialLoginProvider, SamlLoginProvider, LoginMethod } from "./loginMethod"
 export type { CustomRoleMappings, CustomRoleMapping } from "./customRoleMappings"
