@@ -130,6 +130,8 @@ import {
     UserMetadata,
 } from "./user"
 import { validateOrgApiKey, validatePersonalApiKey } from "./validators"
+import { AttritionReportInterval, ChampionReportInterval, ChurnReportInterval, GrowthReportInterval, OrgReport, OrgReportType, ReengagementReportInterval, ReportPagination, TopInviterReportInterval, UserReport, UserReportType } from "./reports"
+import { fetchOrgReport, fetchUserReport } from "./api/reports"
 
 export function getApis(authUrl: URL, integrationApiKey: string) {
     function fetchTokenVerificationMetadataWrapper(): Promise<TokenVerificationMetadata> {
@@ -462,6 +464,62 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return verifySmsChallenge(authUrl, integrationApiKey, verifySmsChallengeRequest)
     }
 
+    function fetchUserTopInviterReportWrapper(
+        reportInterval?: TopInviterReportInterval,
+        pagination?: ReportPagination,
+    ): Promise<UserReport> {
+        return fetchUserReport(authUrl, integrationApiKey, UserReportType.TOP_INVITERS, reportInterval, pagination)
+    }
+
+    function fetchUserChampionReportWrapper(
+        reportInterval?: ChampionReportInterval,
+        pagination?: ReportPagination,
+    ): Promise<UserReport> {
+        return fetchUserReport(authUrl, integrationApiKey, UserReportType.CHAMPION, reportInterval, pagination)
+    }
+
+    function fetchUserReengagementReportWrapper(
+        reportInterval?: ReengagementReportInterval,
+        pagination?: ReportPagination,
+    ): Promise<UserReport> {
+        return fetchUserReport(authUrl, integrationApiKey, UserReportType.REENGAGEMENT, reportInterval, pagination)
+    }
+
+    function fetchUserChurnReportWrapper(
+        reportInterval?: ChurnReportInterval,
+        pagination?: ReportPagination,
+    ): Promise<UserReport> {
+        return fetchUserReport(authUrl, integrationApiKey, UserReportType.CHURN, reportInterval, pagination)
+    }
+
+    function fetchOrgReengagementReportWrapper(
+        reportInterval?: ReengagementReportInterval,
+        pagination?: ReportPagination,
+    ): Promise<OrgReport> {
+        return fetchOrgReport(authUrl, integrationApiKey, OrgReportType.REENGAGEMENT, reportInterval, pagination)
+    }
+
+    function fetchOrgChurnReportWrapper(
+        reportInterval?: ChurnReportInterval,
+        pagination?: ReportPagination,
+    ): Promise<OrgReport> {
+        return fetchOrgReport(authUrl, integrationApiKey, OrgReportType.CHURN, reportInterval, pagination)
+    }
+
+    function fetchOrgGrowthReportWrapper(
+        reportInterval?: GrowthReportInterval,
+        pagination?: ReportPagination,
+    ): Promise<OrgReport> {
+        return fetchOrgReport(authUrl, integrationApiKey, OrgReportType.GROWTH, reportInterval, pagination)
+    }
+
+    function fetchOrgAttritionReportWrapper(
+        reportInterval?: AttritionReportInterval,
+        pagination?: ReportPagination,
+    ): Promise<OrgReport> {
+        return fetchOrgReport(authUrl, integrationApiKey, OrgReportType.ATTRITION, reportInterval, pagination)
+    }
+
     return {
         // fetching functions
         fetchTokenVerificationMetadata: fetchTokenVerificationMetadataWrapper,
@@ -536,5 +594,14 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         verifySmsChallenge: verifySmsChallengeWrapper,
         // employee functions
         fetchEmployeeById: fetchEmployeeByIdWrapper,
+        // report data fetching functions
+        fetchUserTopInviterReport: fetchUserTopInviterReportWrapper,
+        fetchUserChampionReport: fetchUserChampionReportWrapper,
+        fetchUserReengagementReport: fetchUserReengagementReportWrapper,
+        fetchUserChurnReport: fetchUserChurnReportWrapper,
+        fetchOrgReengagementReport: fetchOrgReengagementReportWrapper,
+        fetchOrgChurnReport: fetchOrgChurnReportWrapper,
+        fetchOrgGrowthReport: fetchOrgGrowthReportWrapper,
+        fetchOrgAttritionReport: fetchOrgAttritionReportWrapper,
     }
 }

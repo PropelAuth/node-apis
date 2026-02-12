@@ -80,6 +80,20 @@ export {
 export type { SocialLoginProvider, SamlLoginProvider, LoginMethod } from "./loginMethod"
 export type { CustomRoleMappings, CustomRoleMapping } from "./customRoleMappings"
 export type {
+    ReengagementReportInterval,
+    ChampionReportInterval,
+    ChurnReportInterval, 
+    GrowthReportInterval,
+    AttritionReportInterval,
+    TopInviterReportInterval,
+    ReportPagination,
+    UserReport,
+    UserReportRecord,
+    OrgReport,
+    OrgReportRecord,
+    UserOrgMembershipForReport,
+} from './reports'
+export type {
     UserProperties,
     User,
     Org,
