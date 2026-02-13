@@ -6,7 +6,7 @@ export type ReportPagination = {
 // org report types
 
 export type OrgReportRecord = {
-    recordId: string,
+    id: string,
     reportId: string,
     orgId: string,
     name: string,
@@ -40,7 +40,7 @@ export type UserOrgMembershipForReport = {
 }
 
 export type UserReportRecord = {
-    recordId: string,
+    id: string,
     reportId: string,
     userId: string,
     email: string,
