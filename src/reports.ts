@@ -100,3 +100,30 @@ export enum AttritionReportInterval {
     SIXTY_DAYS = "60",
     NINETY_DAYS = "90",
 }
+
+// chart data types
+
+export enum ChartMetric {
+    SIGNUPS = "signups",
+    ORGS_CREATED = "orgs_created",
+    ACTIVE_USERS = "active_users",
+    ACTIVE_ORGS = "active_orgs",
+}
+
+export enum ChartMetricCadence {
+    DAILY = "Daily",
+    WEEKLY = "Weekly",
+    MONTHLY = "Monthly",
+}
+
+export type ChartDataPoint = {
+    result: number,
+    date: string, // YYYY-MM-DD format date
+    cadenceCompleted: boolean,
+}
+
+export type ChartData = {
+    chartType: string,
+    cadence: ChartMetricCadence,
+    metrics: ChartDataPoint[],
+}

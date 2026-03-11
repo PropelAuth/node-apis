@@ -130,8 +130,23 @@ import {
     UserMetadata,
 } from "./user"
 import { validateOrgApiKey, validatePersonalApiKey } from "./validators"
-import { AttritionReportInterval, ChampionReportInterval, ChurnReportInterval, GrowthReportInterval, OrgReport, OrgReportType, ReengagementReportInterval, ReportPagination, TopInviterReportInterval, UserReport, UserReportType } from "./reports"
-import { fetchOrgReport, fetchUserReport } from "./api/reports"
+import {
+    AttritionReportInterval,
+    ChampionReportInterval,
+    ChartData,
+    ChartMetric,
+    ChartMetricCadence,
+    ChurnReportInterval,
+    GrowthReportInterval,
+    OrgReport,
+    OrgReportType,
+    ReengagementReportInterval,
+    ReportPagination,
+    TopInviterReportInterval,
+    UserReport,
+    UserReportType
+} from "./reports"
+import { fetchChartMetricData, fetchOrgReport, fetchUserReport } from "./api/reports"
 
 export function getApis(authUrl: URL, integrationApiKey: string) {
     function fetchTokenVerificationMetadataWrapper(): Promise<TokenVerificationMetadata> {
@@ -520,6 +535,15 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return fetchOrgReport(authUrl, integrationApiKey, OrgReportType.ATTRITION, reportInterval, pagination)
     }
 
+    function fetchChartMetricDataWrapper(
+        chartMetric: ChartMetric,
+        cadence: ChartMetricCadence,
+        startDate?: Date,
+        endDate?: Date,
+    ): Promise<ChartData> {
+        return fetchChartMetricData(authUrl, integrationApiKey, chartMetric, cadence, startDate, endDate)
+    }
+
     return {
         // fetching functions
         fetchTokenVerificationMetadata: fetchTokenVerificationMetadataWrapper,
@@ -603,5 +627,6 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         fetchOrgChurnReport: fetchOrgChurnReportWrapper,
         fetchOrgGrowthReport: fetchOrgGrowthReportWrapper,
         fetchOrgAttritionReport: fetchOrgAttritionReportWrapper,
+        fetchChartMetricData: fetchChartMetricDataWrapper,
     }
 }

@@ -92,6 +92,10 @@ export type {
     OrgReport,
     OrgReportRecord,
     UserOrgMembershipForReport,
+    ChartData,
+    ChartDataPoint,
+    ChartMetric,
+    ChartMetricCadence,
 } from './reports'
 export type {
     UserProperties,
