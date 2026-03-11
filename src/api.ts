@@ -145,8 +145,8 @@ import {
     TopInviterReportInterval,
     UserReport,
     UserReportType
-} from "./reports"
-import { fetchChartMetricData, fetchOrgReport, fetchUserReport } from "./api/reports"
+} from "./userInsights"
+import { fetchChartMetricData, fetchOrgReport, fetchUserReport } from "./api/userInsights"
 
 export function getApis(authUrl: URL, integrationApiKey: string) {
     function fetchTokenVerificationMetadataWrapper(): Promise<TokenVerificationMetadata> {

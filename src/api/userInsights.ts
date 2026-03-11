@@ -9,7 +9,7 @@ import {
     ReportPagination,
     UserReport,
     UserReportType,
-} from "../reports"
+} from "../userInsights"
 import { formatQueryParameters, parseSnakeCaseToCamelCase, } from "../utils"
 
 const USER_REPORTS_PATH = "/api/backend/v1/user_report"

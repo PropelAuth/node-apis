@@ -96,7 +96,7 @@ export type {
     ChartDataPoint,
     ChartMetric,
     ChartMetricCadence,
-} from './reports'
+} from './userInsights'
 export type {
     UserProperties,
     User,
