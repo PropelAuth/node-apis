@@ -22,6 +22,11 @@ export type {
     FetchSamlSpMetadataResponse,
     SetSamlIdpMetadataRequest,
     IdpProvider,
+    SetOidcIdpMetadataRequestBase,
+    SetGenericOidcMetadataRequest,
+    SetOktaOidcMetadataRequest,
+    SetAzureOidcMetadataRequest,
+    SetOidcIdpMetadataRequest,
 } from "./api/org"
 export type { TokenVerificationMetadata } from "./api/tokenVerificationMetadata"
 export type {
@@ -43,7 +48,15 @@ export type {
     FetchUserMfaMethodsResponse,
 } from "./api/user"
 export type { MigrateUserFromExternalSourceRequest, MigrateUserPasswordRequest } from "./api/migrateUser"
-export type { ApiKeysQueryRequest, ApiKeysCreateRequest, ApiKeyUpdateRequest, ApiKeyUsageQueryRequest, ApiKeysImportRequest, ApiKeyUsageQueryResponse, ApiKeysImportResponse } from "./api/endUserApiKeys"
+export type {
+    ApiKeysQueryRequest,
+    ApiKeysCreateRequest,
+    ApiKeyUpdateRequest,
+    ApiKeyUsageQueryRequest,
+    ApiKeysImportRequest,
+    ApiKeyUsageQueryResponse,
+    ApiKeysImportResponse,
+} from "./api/endUserApiKeys"
 export {
     ApiKeyValidateException,
     ApiKeyValidateRateLimitedException,
@@ -97,7 +110,18 @@ export type {
     OrgApiKeyValidation,
     InternalUser,
     InternalOrgMemberInfo,
+    SocialLoginTokenProvider,
+    SocialLoginToken,
+    SocialLoginTokensResponse,
 } from "./user"
+export type {
+    ScimGroup,
+    ScimGroupResultPage,
+    ScimGroupResult,
+    ScimGroupMember,
+    FetchOrgScimGroupsRequest,
+    FetchScimGroupRequest,
+} from "./scim"
 export { UserClass, OrgMemberInfo, OrgRoleStructure, toUser, toOrgIdToOrgMemberInfo } from "./user"
 export { getApis } from "./api"
 export { parseSnakeCaseToCamelCase } from "./utils"

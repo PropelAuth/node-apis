@@ -9,6 +9,8 @@ export type CreateMagicLinkRequest = {
     expiresInHours?: number
     createNewUserIfOneDoesntExist?: boolean
     expiresAfterFirstUse?: boolean
+    requiresInterstitial?: boolean
+    userSignupQueryParams?: { [key: string]: string }
 }
 
 export type MagicLink = {
@@ -27,6 +29,8 @@ export function createMagicLink(
         expires_in_hours: createMagicLinkRequest.expiresInHours,
         create_new_user_if_one_doesnt_exist: createMagicLinkRequest.createNewUserIfOneDoesntExist,
         expire_after_first_use: createMagicLinkRequest.expiresAfterFirstUse,
+        requires_interstitial: createMagicLinkRequest.requiresInterstitial,
+        user_signup_query_parameters: createMagicLinkRequest.userSignupQueryParams,
     }
     return httpRequest(authUrl, integrationApiKey, ENDPOINT_PATH, "POST", JSON.stringify(request)).then(
         (httpResponse) => {

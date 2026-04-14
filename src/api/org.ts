@@ -205,6 +205,8 @@ export function fetchOrgByQuery(authUrl: URL, integrationApiKey: string, query: 
                     this.pageSize = value
                 } else if (key === "has_more_results") {
                     this.hasMoreResults = value
+                } else if (key === "created_at") {
+                    this.createdAt = value
                 } else {
                     return value
                 }
@@ -299,23 +301,27 @@ export function addUserToOrg(
         role: addUserToOrgRequest.role,
         additional_roles: addUserToOrgRequest.additionalRoles ?? [],
     }
-    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/add_user`, "POST", JSON.stringify(request)).then(
-        (httpResponse) => {
-            if (httpResponse.statusCode === 401) {
-                throw new Error("integrationApiKey is incorrect")
-            } else if (httpResponse.statusCode === 429) {
-                throw new RateLimitedException(httpResponse.response)
-            } else if (httpResponse.statusCode === 400) {
-                throw new AddUserToOrgException(httpResponse.response)
-            } else if (httpResponse.statusCode === 404) {
-                return false
-            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
-                throw new Error("Unknown error when adding user to org")
-            }
-
-            return true
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${ORG_ENDPOINT_PATH}/add_user`,
+        "POST",
+        JSON.stringify(request)
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
+        } else if (httpResponse.statusCode === 400) {
+            throw new AddUserToOrgException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when adding user to org")
         }
-    )
+
+        return true
+    })
 }
 
 export type ChangeUserRoleInOrgRequest = {
@@ -493,7 +499,7 @@ export type SetSamlIdpMetadataRequest = {
     provider: IdpProvider
 }
 
-export type IdpProvider = "Google" | "Rippling" | "OneLogin" | "JumpCloud" | "Okta" | "Azure" | "Duo" | "Generic";
+export type IdpProvider = "Google" | "Rippling" | "OneLogin" | "JumpCloud" | "Okta" | "Azure" | "Duo" | "Generic"
 
 export function setSamlIdpMetadata(
     authUrl: URL,
@@ -511,7 +517,7 @@ export function setSamlIdpMetadata(
         idp_sso_url: setSamlIdpMetadataRequest.idpSsoUrl,
         idp_certificate: setSamlIdpMetadataRequest.idpCertificate,
         provider: setSamlIdpMetadataRequest.provider,
-    };
+    }
 
     return httpRequest(
         authUrl,
@@ -519,49 +525,46 @@ export function setSamlIdpMetadata(
         `${BASE_ENDPOINT_PATH}/saml_idp_metadata`,
         "POST",
         JSON.stringify(request)
-    ).then(
-        (httpResponse) => {
-            if (httpResponse.statusCode === 401) {
-                throw new Error("integrationApiKey is incorrect")
-            } else if (httpResponse.statusCode === 429) {
-                throw new RateLimitedException(httpResponse.response)
-            } else if (httpResponse.statusCode === 400) {
-                throw new UpdateOrgException(httpResponse.response)
-            } else if (httpResponse.statusCode === 404) {
-                return false
-            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
-                throw new Error("Unknown error when setting the SAML IdP metadata for an org's SAML connection")
-            }
-
-            return true
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
+        } else if (httpResponse.statusCode === 400) {
+            throw new UpdateOrgException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when setting the SAML IdP metadata for an org's SAML connection")
         }
-    )
+
+        return true
+    })
 }
 
-export function samlGoLive(
-    authUrl: URL,
-    integrationApiKey: string,
-    orgId: string
-): Promise<boolean> {
+export function samlGoLive(authUrl: URL, integrationApiKey: string, orgId: string): Promise<boolean> {
     if (!isValidId(orgId)) {
         return Promise.resolve(false)
     }
 
-    return httpRequest(authUrl, integrationApiKey, `${BASE_ENDPOINT_PATH}/saml_idp_metadata/go_live/${orgId}`, "POST").then(
-        (httpResponse) => {
-            if (httpResponse.statusCode === 401) {
-                throw new Error("integrationApiKey is incorrect")
-            } else if (httpResponse.statusCode === 429) {
-                throw new RateLimitedException(httpResponse.response)
-            } else if (httpResponse.statusCode === 404) {
-                return false
-            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
-                throw new Error("Unknown error when setting orgs SAML connection to go live")
-            }
-
-            return true
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${BASE_ENDPOINT_PATH}/saml_idp_metadata/go_live/${orgId}`,
+        "POST"
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when setting orgs SAML connection to go live")
         }
-    )
+
+        return true
+    })
 }
 
 // PUT/PATCH
@@ -577,6 +580,9 @@ export type UpdateOrgRequest = {
     legacyOrgId?: string
     require2faBy?: string
     extraDomains?: string[]
+    passwordRotationEnabled?: boolean
+    passwordRotationHistorySize?: number
+    passwordRotationPeriod?: number
 }
 
 export function updateOrg(
@@ -599,6 +605,9 @@ export function updateOrg(
         legacy_org_id: updateOrgRequest.legacyOrgId,
         require_2fa_by: updateOrgRequest.require2faBy,
         extra_domains: updateOrgRequest.extraDomains,
+        password_rotation_enabled: updateOrgRequest.passwordRotationEnabled,
+        password_rotation_history_size: updateOrgRequest.passwordRotationHistorySize,
+        password_rotation_period: updateOrgRequest.passwordRotationPeriod,
     }
     return httpRequest(
         authUrl,
@@ -636,23 +645,27 @@ export function subscribeOrgToRoleMapping(
     const request = {
         custom_role_mapping_name: customRoleMappingName,
     }
-    return httpRequest(authUrl, integrationApiKey, `${ORG_ENDPOINT_PATH}/${orgId}`, "PUT", JSON.stringify(request)).then(
-        (httpResponse) => {
-            if (httpResponse.statusCode === 401) {
-                throw new Error("integrationApiKey is incorrect")
-            } else if (httpResponse.statusCode === 429) {
-                throw new RateLimitedException(httpResponse.response)
-            } else if (httpResponse.statusCode === 400) {
-                throw new UpdateOrgException(httpResponse.response)
-            } else if (httpResponse.statusCode === 404) {
-                return false
-            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
-                throw new Error("Unknown error when subscribing an org to a role mapping")
-            }
-
-            return true
+    return httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${ORG_ENDPOINT_PATH}/${orgId}`,
+        "PUT",
+        JSON.stringify(request)
+    ).then((httpResponse) => {
+        if (httpResponse.statusCode === 401) {
+            throw new Error("integrationApiKey is incorrect")
+        } else if (httpResponse.statusCode === 429) {
+            throw new RateLimitedException(httpResponse.response)
+        } else if (httpResponse.statusCode === 400) {
+            throw new UpdateOrgException(httpResponse.response)
+        } else if (httpResponse.statusCode === 404) {
+            return false
+        } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+            throw new Error("Unknown error when subscribing an org to a role mapping")
         }
-    )
+
+        return true
+    })
 }
 
 // DELETE
@@ -713,31 +726,109 @@ export function revokePendingOrgInvite(
     })
 }
 
-export function deleteSamlConnection(
-    authUrl: URL,
-    integrationApiKey: string,
-    orgId: string
-): Promise<boolean> {
+export function deleteSamlConnection(authUrl: URL, integrationApiKey: string, orgId: string): Promise<boolean> {
     if (!isValidId(orgId)) {
         return Promise.resolve(false)
+    }
+
+    return httpRequest(authUrl, integrationApiKey, `${BASE_ENDPOINT_PATH}/saml_idp_metadata/${orgId}`, "DELETE").then(
+        (httpResponse) => {
+            if (httpResponse.statusCode === 401) {
+                throw new Error("integrationApiKey is incorrect")
+            } else if (httpResponse.statusCode === 429) {
+                throw new RateLimitedException(httpResponse.response)
+            } else if (httpResponse.statusCode === 400) {
+                throw new RevokePendingOrgInviteException(httpResponse.response)
+            } else if (httpResponse.statusCode === 404) {
+                return false
+            } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+                throw new Error("Unknown error when deleting SAML connection")
+            }
+
+            return true
+        }
+    )
+}
+
+export type SetOidcIdpMetadataRequestBase = {
+    orgId: string
+    clientId: string
+    clientSecret: string
+    usesPkce: boolean
+}
+
+export type SetGenericOidcMetadataRequest = SetOidcIdpMetadataRequestBase & {
+    idpType: "Generic"
+    authUrl: string
+    tokenUrl: string
+    userinfoUrl: string
+}
+
+export type SetOktaOidcMetadataRequest = SetOidcIdpMetadataRequestBase & {
+    idpType: "Okta"
+    oktaSsoDomain: string
+}
+
+export type SetAzureOidcMetadataRequest = SetOidcIdpMetadataRequestBase & {
+    idpType: "Azure"
+    entraTenantId: string
+}
+
+export type SetOidcIdpMetadataRequest =
+    | SetGenericOidcMetadataRequest
+    | SetOktaOidcMetadataRequest
+    | SetAzureOidcMetadataRequest
+
+export function setOidcIdpMetadata(
+    authUrl: URL,
+    integrationApiKey: string,
+    setOidcIdpMetadataRequest: SetOidcIdpMetadataRequest
+): Promise<boolean> {
+    if (!isValidId(setOidcIdpMetadataRequest.orgId)) {
+        return Promise.resolve(false)
+    }
+
+    let request: Record<string, unknown> = {
+        org_id: setOidcIdpMetadataRequest.orgId,
+        client_id: setOidcIdpMetadataRequest.clientId,
+        client_secret: setOidcIdpMetadataRequest.clientSecret,
+        uses_pkce: setOidcIdpMetadataRequest.usesPkce,
+        idp_type: setOidcIdpMetadataRequest.idpType,
+    }
+    switch (setOidcIdpMetadataRequest.idpType) {
+        case "Generic":
+            request = {
+                ...request,
+                auth_url: setOidcIdpMetadataRequest.authUrl,
+                token_url: setOidcIdpMetadataRequest.tokenUrl,
+                userinfo_url: setOidcIdpMetadataRequest.userinfoUrl,
+            }
+            break
+        case "Okta":
+            request = { ...request, okta_sso_domain: setOidcIdpMetadataRequest.oktaSsoDomain }
+            break
+        case "Azure":
+            request = { ...request, entra_tenant_id: setOidcIdpMetadataRequest.entraTenantId }
+            break
     }
 
     return httpRequest(
         authUrl,
         integrationApiKey,
-        `${BASE_ENDPOINT_PATH}/saml_idp_metadata/${orgId}`,
-        "DELETE"
+        `${BASE_ENDPOINT_PATH}/oidc_idp_metadata`,
+        "POST",
+        JSON.stringify(request)
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
             throw new Error("integrationApiKey is incorrect")
         } else if (httpResponse.statusCode === 429) {
             throw new RateLimitedException(httpResponse.response)
         } else if (httpResponse.statusCode === 400) {
-            throw new RevokePendingOrgInviteException(httpResponse.response)
+            throw new UpdateOrgException(httpResponse.response)
         } else if (httpResponse.statusCode === 404) {
             return false
         } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
-            throw new Error("Unknown error when deleting SAML connection")
+            throw new Error("Unknown error when setting the OIDC IdP metadata for an org's OIDC connection")
         }
 
         return true

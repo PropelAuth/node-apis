@@ -109,6 +109,7 @@ export type ApiKeysCreateRequest = {
     userId?: string
     expiresAtSeconds?: number
     metadata?: object
+    displayName?: string
 }
 
 export function createApiKey(
@@ -121,6 +122,7 @@ export function createApiKey(
         user_id: apiKeyCreate.userId,
         expires_at_seconds: apiKeyCreate.expiresAtSeconds,
         metadata: apiKeyCreate.metadata,
+        display_name: apiKeyCreate.displayName,
     }
 
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}`, "POST", JSON.stringify(request)).then(
@@ -178,6 +180,7 @@ export type ApiKeysImportRequest = {
     userId?: string
     expiresAtSeconds?: number
     metadata?: object
+    displayName?: string
 }
 
 export type ApiKeysImportResponse = {
@@ -195,6 +198,7 @@ export function importApiKey(
         user_id: apiKeyImport.userId,
         expires_at_seconds: apiKeyImport.expiresAtSeconds,
         metadata: apiKeyImport.metadata,
+        display_name: apiKeyImport.displayName,
     }
 
     return httpRequest(authUrl, integrationApiKey, `${ENDPOINT_PATH}/import`, "POST", JSON.stringify(request)).then(
