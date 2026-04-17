@@ -79,13 +79,17 @@ export {
 } from "./exceptions"
 export type { SocialLoginProvider, SamlLoginProvider, LoginMethod } from "./loginMethod"
 export type { CustomRoleMappings, CustomRoleMapping } from "./customRoleMappings"
-export type {
+export {
     ReengagementReportInterval,
     ChampionReportInterval,
     ChurnReportInterval, 
     GrowthReportInterval,
     AttritionReportInterval,
     TopInviterReportInterval,
+    ChartMetric,
+    ChartMetricCadence,
+} from './userInsights'
+export type {
     ReportPagination,
     UserReport,
     UserReportRecord,
@@ -94,8 +98,6 @@ export type {
     UserOrgMembershipForReport,
     ChartData,
     ChartDataPoint,
-    ChartMetric,
-    ChartMetricCadence,
 } from './userInsights'
 export type {
     UserProperties,
