@@ -7,7 +7,7 @@ import {
     UpdateUserPasswordException,
 } from "../exceptions"
 import { httpRequest } from "../http"
-import { CreatedUser, UserMetadata } from "../user"
+import { CreatedUser, SocialLoginToken, SocialLoginTokenProvider, SocialLoginTokensResponse, UserMetadata } from "../user"
 import { formatQueryParameters, isValidId, parseSnakeCaseToCamelCase } from "../utils"
 
 const ENDPOINT_PATH = "/api/backend/v1/user"
@@ -198,6 +198,61 @@ export async function fetchUserMfaMethods(
         return null
     } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
         throw new Error("Unknown error when fetching user mfa methods")
+    }
+
+    return parseSnakeCaseToCamelCase(httpResponse.response)
+}
+
+export async function fetchUserOAuthTokens(
+    authUrl: URL,
+    integrationApiKey: string,
+    userId: string
+): Promise<SocialLoginTokensResponse | null> {
+    if (!isValidId(userId)) {
+        return Promise.resolve(null)
+    }
+
+    const httpResponse = await httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${ENDPOINT_PATH}/${userId}/oauth_token`,
+        "GET"
+    )
+    if (httpResponse.statusCode === 401) {
+        throw new Error("integrationApiKey is incorrect")
+    } else if (httpResponse.statusCode === 429) {
+        throw new RateLimitedException(httpResponse.response)
+    } else if (httpResponse.statusCode === 404) {
+        return null
+    } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+        throw new Error("Unknown error when fetching user mfa methods")
+    }
+
+    return parseSnakeCaseToCamelCase(httpResponse.response)
+}
+
+export async function fetchFreshTokenFromProvider(
+    authUrl: URL,
+    integrationApiKey: string,
+    userId: string,
+    provider: SocialLoginTokenProvider
+): Promise<SocialLoginToken | null> {
+    if (!isValidId(userId)) {
+        return Promise.resolve(null)
+    }
+
+    const httpResponse = await httpRequest(
+        authUrl,
+        integrationApiKey,
+        `${ENDPOINT_PATH}/${userId}/${provider}/fresh_token`,
+        "GET"
+    )
+    if (httpResponse.statusCode === 401) {
+        throw new Error("integrationApiKey is incorrect")
+    } else if (httpResponse.statusCode === 429) {
+        throw new RateLimitedException(httpResponse.response)
+    } else if (httpResponse.statusCode && httpResponse.statusCode >= 400) {
+        throw new Error("Unknown error when fetching fresh token from provider.")
     }
 
     return parseSnakeCaseToCamelCase(httpResponse.response)

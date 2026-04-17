@@ -159,6 +159,7 @@ export type Org = {
     legacyOrgId?: string
     metadata: { [key: string]: any }
     customRoleMappingName?: string
+    createdAt?: number
 }
 
 export type Organization = {
@@ -176,6 +177,9 @@ export type Organization = {
     domainRestrict: boolean
     customRoleMappingName?: string
     legacyOrgId?: string
+    passwordRotationEnabled: boolean
+    passwordRotationHistorySize: number
+    passwordRotationPeriod: number
 }
 
 export type CreatedOrg = {
@@ -439,6 +443,7 @@ export type ApiKeyFull = {
     metadata: { [key: string]: any }
     userId: string
     orgId: string
+    displayName?: string
 }
 
 export type ApiKeyResultPage = {
@@ -467,3 +472,28 @@ export type OrgApiKeyValidation = {
     user?: UserMetadata
     userInOrg?: OrgMemberInfo
 }
+
+export type SocialLoginTokenProvider =
+  | "apple"
+  | "google"
+  | "github"
+  | "microsoft"
+  | "slack"
+  | "salesforce"
+  | "linkedin"
+  | "outreach"
+  | "quickbooks"
+  | "xero"
+  | "salesloft"
+  | "atlassian"
+  | "gitlab"
+
+export type SocialLoginToken = {
+  accessToken: string;
+  refreshToken?: string;
+  tokenProvider: SocialLoginTokenProvider;
+  tokenExpiration?: number;
+  authorizedScopes?: string[];
+}
+
+export type SocialLoginTokensResponse = Partial<Record<SocialLoginTokenProvider, SocialLoginToken>>
