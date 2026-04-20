@@ -16,23 +16,15 @@ import {
     importApiKey,
     ApiKeysImportRequest,
     ApiKeysImportResponse,
-    validateImportedApiKey
+    validateImportedApiKey,
 } from "./api/endUserApiKeys"
 import {
     StepUpMfaVerifyTotpResponse,
     VerifyTotpChallengeRequest,
     verifyStepUpTotpChallenge,
 } from "./api/mfa/verifyTotp"
-import {
-    sendSmsMfaCode,
-    SendSmsMfaCodeRequestResponse,
-    SendSmsMfaCodeRequest
-} from "./api/mfa/sendSmsMfaCode"
-import {
-    verifySmsChallenge,
-    VerifySmsChallengeRequest,
-    VerifySmsChallengeResponse
-} from "./api/mfa/verifySmsChallenge"
+import { sendSmsMfaCode, SendSmsMfaCodeRequestResponse, SendSmsMfaCodeRequest } from "./api/mfa/sendSmsMfaCode"
+import { verifySmsChallenge, VerifySmsChallengeRequest, VerifySmsChallengeResponse } from "./api/mfa/verifySmsChallenge"
 import { StepUpMfaVerifyGrantResponse, VerifyStepUpGrantRequest, verifyStepUpGrant } from "./api/mfa/verifyGrant"
 import { createMagicLink, CreateMagicLinkRequest, MagicLink } from "./api/magicLink"
 import { fetchEmployeeById, Employee } from "./api/employee"
@@ -70,6 +62,8 @@ import {
     revokePendingOrgInvite,
     RevokePendingOrgInviteRequest,
     samlGoLive,
+    setOidcIdpMetadata,
+    SetOidcIdpMetadataRequest,
     setSamlIdpMetadata,
     SetSamlIdpMetadataRequest,
     subscribeOrgToRoleMapping,
@@ -114,7 +108,9 @@ import {
     MfaPhoneType,
     MfaPhones,
     MfaTotpType,
-    FetchUserMfaMethodsResponse
+    FetchUserMfaMethodsResponse,
+    fetchFreshTokenFromProvider,
+    fetchUserOAuthTokens,
 } from "./api/user"
 import { CustomRoleMappings } from "./customRoleMappings"
 import {
@@ -127,8 +123,13 @@ import {
     Organization,
     OrgApiKeyValidation,
     PersonalApiKeyValidation,
+    SocialLoginToken,
+    SocialLoginTokenProvider,
+    SocialLoginTokensResponse,
     UserMetadata,
 } from "./user"
+import { ScimGroup, ScimGroupResultPage, FetchOrgScimGroupsRequest, FetchScimGroupRequest } from "./scim"
+import { fetchScimGroup, fetchOrgScimGroups } from "./api/scim"
 import { validateOrgApiKey, validatePersonalApiKey } from "./validators"
 import {
     AttritionReportInterval,
@@ -287,6 +288,17 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return enableUserCanCreateOrgs(authUrl, integrationApiKey, userId)
     }
 
+    function fetchUserOAuthTokensWrapper(userId: string): Promise<SocialLoginTokensResponse | null> {
+        return fetchUserOAuthTokens(authUrl, integrationApiKey, userId)
+    }
+
+    function fetchFreshTokenFromProviderWrapper(
+        userId: string,
+        provider: SocialLoginTokenProvider
+    ): Promise<SocialLoginToken | null> {
+        return fetchFreshTokenFromProvider(authUrl, integrationApiKey, userId, provider)
+    }
+
     function disableUserCanCreateOrgsWrapper(userId: string): Promise<boolean> {
         return disableUserCanCreateOrgs(authUrl, integrationApiKey, userId)
     }
@@ -364,6 +376,10 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return setSamlIdpMetadata(authUrl, integrationApiKey, orgId, samlIdpMetadata)
     }
 
+    function setOidcIdpMetadataWrapper(setOidcIdpMetadataRequest: SetOidcIdpMetadataRequest): Promise<boolean> {
+        return setOidcIdpMetadata(authUrl, integrationApiKey, setOidcIdpMetadataRequest)
+    }
+
     function samlGoLiveWrapper(orgId: string): Promise<boolean> {
         return samlGoLive(authUrl, integrationApiKey, orgId)
     }
@@ -376,7 +392,9 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return inviteUserToOrg(authUrl, integrationApiKey, inviteUserToOrgRequest)
     }
 
-    function inviteUserToOrgByUserIdWrapper(inviteUserToOrgByUserIdRequest: InviteUserToOrgByUserIdRequest): Promise<boolean> {
+    function inviteUserToOrgByUserIdWrapper(
+        inviteUserToOrgByUserIdRequest: InviteUserToOrgByUserIdRequest
+    ): Promise<boolean> {
         return inviteUserToOrgByUserId(authUrl, integrationApiKey, inviteUserToOrgByUserIdRequest)
     }
 
@@ -443,27 +461,19 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         return verifyStepUpGrant(authUrl, integrationApiKey, verifyStepUpGrantRequest)
     }
 
-    function fetchApiKeyUsageWrapper(
-        apiKeyUsageQuery: ApiKeyUsageQueryRequest
-    ): Promise<ApiKeyUsageQueryResponse> {
+    function fetchApiKeyUsageWrapper(apiKeyUsageQuery: ApiKeyUsageQueryRequest): Promise<ApiKeyUsageQueryResponse> {
         return fetchApiKeyUsage(authUrl, integrationApiKey, apiKeyUsageQuery)
     }
 
-    function importApiKeyWrapper(
-        apiKeysImportRequest: ApiKeysImportRequest
-    ): Promise<ApiKeysImportResponse> {
+    function importApiKeyWrapper(apiKeysImportRequest: ApiKeysImportRequest): Promise<ApiKeysImportResponse> {
         return importApiKey(authUrl, integrationApiKey, apiKeysImportRequest)
     }
 
-    function validateImportedApiKeyWrapper(
-        apiKeyToken: string
-    ): Promise<ApiKeyValidation> {
+    function validateImportedApiKeyWrapper(apiKeyToken: string): Promise<ApiKeyValidation> {
         return validateImportedApiKey(authUrl, integrationApiKey, apiKeyToken)
     }
 
-    function fetchUserMfaMethodsWrapper(
-        userId: string
-    ): Promise<FetchUserMfaMethodsResponse | null> {
+    function fetchUserMfaMethodsWrapper(userId: string): Promise<FetchUserMfaMethodsResponse | null> {
         return fetchUserMfaMethods(authUrl, integrationApiKey, userId)
     }
 
@@ -543,6 +553,15 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
     ): Promise<ChartData> {
         return fetchChartMetricData(authUrl, integrationApiKey, chartMetric, cadence, startDate, endDate)
     }
+    function fetchScimGroupWrapper(fetchScimGroupRequest: FetchScimGroupRequest): Promise<ScimGroup> {
+        return fetchScimGroup(authUrl, integrationApiKey, fetchScimGroupRequest)
+    }
+
+    function fetchOrgScimGroupsWrapper(
+        fetchOrgScimGroupsRequest: FetchOrgScimGroupsRequest
+    ): Promise<ScimGroupResultPage> {
+        return fetchOrgScimGroups(authUrl, integrationApiKey, fetchOrgScimGroupsRequest)
+    }
 
     return {
         // fetching functions
@@ -579,6 +598,8 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         disableUserCanCreateOrgs: disableUserCanCreateOrgsWrapper,
         logoutAllUserSessions: logoutAllUserSessionsWrapper,
         fetchUserMfaMethods: fetchUserMfaMethodsWrapper,
+        fetchUserOAuthTokens: fetchUserOAuthTokensWrapper,
+        fetchFreshTokenFromProvider: fetchFreshTokenFromProviderWrapper,
         // org management functions
         createOrg: createOrgWrapper,
         addUserToOrg: addUserToOrgWrapper,
@@ -596,6 +617,7 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         revokePendingOrgInvite: revokePendingOrgInviteWrapper,
         fetchSamlSpMetadata: fetchSamlSpMetadataWrapper,
         setSamlIdpMetadata: setSamlIdpMetadataWrapper,
+        setOidcIdpMetadata: setOidcIdpMetadataWrapper,
         samlGoLive: samlGoLiveWrapper,
         deleteSamlConnection: deleteSamlConnectionWrapper,
         // api keys functions
@@ -628,5 +650,8 @@ export function getApis(authUrl: URL, integrationApiKey: string) {
         fetchOrgGrowthReport: fetchOrgGrowthReportWrapper,
         fetchOrgAttritionReport: fetchOrgAttritionReportWrapper,
         fetchChartMetricData: fetchChartMetricDataWrapper,
+        // scim functions
+        fetchScimGroup: fetchScimGroupWrapper,
+        fetchOrgScimGroups: fetchOrgScimGroupsWrapper,
     }
 }
