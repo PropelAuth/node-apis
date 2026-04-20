@@ -8,6 +8,8 @@ export type FetchOrgScimGroupsRequest = {
 export type FetchScimGroupRequest = {
     orgId: string
     groupId: string
+    membersPageSize?: number
+    membersPageNumber?: number
 }
 
 export type ScimGroupResult = {

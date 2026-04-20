@@ -43,10 +43,15 @@ export function fetchScimGroup(
     integrationApiKey: string,
     fetchScimGroupRequest: FetchScimGroupRequest
 ): Promise<ScimGroup> {
+    const request = {
+        members_page_size: fetchScimGroupRequest.membersPageSize,
+        members_page_number: fetchScimGroupRequest.membersPageNumber,
+    }
+    const queryString = formatQueryParameters(request)
     return httpRequest(
         authUrl,
         integrationApiKey,
-        `${SCIM_GROUPS_PATH}/${fetchScimGroupRequest.orgId}/groups/${fetchScimGroupRequest.groupId}`,
+        `${SCIM_GROUPS_PATH}/${fetchScimGroupRequest.orgId}/groups/${fetchScimGroupRequest.groupId}?${queryString}`,
         "GET"
     ).then((httpResponse) => {
         if (httpResponse.statusCode === 401) {
