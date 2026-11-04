@@ -4,6 +4,7 @@ import { httpRequest } from "../http"
 export type TokenVerificationMetadata = {
     verifierKey: string
     issuer: string
+    fallbackVerifierKey?: string
 }
 
 const ENDPOINT_PATH = "/api/v1/token_verification_metadata"
@@ -33,6 +34,7 @@ export function fetchTokenVerificationMetadata(
         return {
             verifierKey: jsonParse.verifier_key_pem,
             issuer: formatIssuer(authUrl),
+            fallbackVerifierKey: jsonParse.fallback_verifier_key_pem ?? undefined,
         }
     })
 }
